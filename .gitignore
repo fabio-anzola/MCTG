@@ -1,0 +1,5 @@
+/target/
+.idea/
+src/java/at/fhtw/sampleapp/
+*.sql
+*.yml
