@@ -1,5 +1,5 @@
 /target/
 .idea/
-src/java/at/fhtw/sampleapp/
+src/main/java/at/fhtw/sampleapp/
 *.sql
 *.yml
