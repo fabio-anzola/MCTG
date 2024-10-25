@@ -1,6 +1,6 @@
 package at.fhtw.httpserver.http;
 
-public enum HttpStatus {
+public enum  HttpStatus {
     OK(200, "OK"),
     CREATED(201, "CREATED"),
     ACCEPTED(202, "Accepted"),
