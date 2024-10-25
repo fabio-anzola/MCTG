@@ -1,0 +1,11 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:17
+    ports:
+      - 5432:5432
+    volumes:
+      - ~/Documents/docker/postgresql/pg_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=S3cret
