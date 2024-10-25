@@ -28,6 +28,11 @@ public class UserService implements Service {
             return this.userController.getUserByName(request);
         }
 
+        // PUT + username -> Update specific User
+        if (request.getMethod() == Method.PUT && request.getPathParts().size() > 1) {
+            return this.userController.updateUserByName(request);
+        }
+
         return new Response(
                 HttpStatus.BAD_REQUEST,
                 ContentType.JSON,

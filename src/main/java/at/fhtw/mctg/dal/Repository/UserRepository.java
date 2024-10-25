@@ -35,9 +35,9 @@ public class UserRepository {
 
     public Collection<User> getUserByName(String name) {
         try (PreparedStatement preparedStatement = this.unitOfWork.prepareStatement(
-                             """
-                                         select * from "user" where username = ?
-                                     """)) {
+                """
+                            select * from "user" where username = ?
+                        """)) {
 
             preparedStatement.setString(1, name);
 
@@ -50,10 +50,11 @@ public class UserRepository {
                         resultSet.getInt(1), // ID
                         resultSet.getString(2), // username
                         resultSet.getString(3), // password
-                        resultSet.getString(4), // bio
-                        resultSet.getString(5), // image
-                        resultSet.getInt(6), // wallet
-                        resultSet.getInt(7) // elo
+                        resultSet.getString(4), // name
+                        resultSet.getString(5), // bio
+                        resultSet.getString(6), // image
+                        resultSet.getInt(7), // wallet
+                        resultSet.getInt(8) // elo
                 );
 
                 userRows.add(user);
@@ -62,6 +63,24 @@ public class UserRepository {
             return userRows;
         } catch (SQLException e) {
             throw new DataAccessException("Select not successful", e);
+        }
+    }
+
+    public void updateUserByName(String username, User user) {
+        try (PreparedStatement preparedStatement = this.unitOfWork.prepareStatement(
+                """
+                        UPDATE "user" SET bio = ?, name = ?, image = ?, password = ? WHERE username = ?
+                        """)) {
+            preparedStatement.setString(1, user.getBio());
+            preparedStatement.setString(2, user.getName());
+            preparedStatement.setString(3, user.getImage());
+            preparedStatement.setString(4, user.getPassword());
+            preparedStatement.setString(5, username);
+
+            preparedStatement.execute();
+
+        } catch (SQLException e) {
+            throw new DataAccessException("Update not successful", e);
         }
     }
 
