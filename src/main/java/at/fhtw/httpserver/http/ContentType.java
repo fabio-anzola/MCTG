@@ -1,6 +1,6 @@
 package at.fhtw.httpserver.http;
 
-public enum ContentType {
+public enum   ContentType {
     PLAIN_TEXT("text/plain"),
     HTML("text/html"),
     JSON("application/json");
