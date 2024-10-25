@@ -34,6 +34,7 @@ CREATE TABLE "user"
     pk_user_id SERIAL,
     username   TEXT    NOT NULL,
     password   TEXT    NOT NULL,
+    name        TEXT,
     bio        TEXT,
     image      TEXT,
     wallet     INTEGER NOT NULL DEFAULT 20,
