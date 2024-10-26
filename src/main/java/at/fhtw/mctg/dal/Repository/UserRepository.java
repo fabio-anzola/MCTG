@@ -3,7 +3,6 @@ package at.fhtw.mctg.dal.Repository;
 import at.fhtw.mctg.dal.DataAccessException;
 import at.fhtw.mctg.dal.UnitOfWork;
 import at.fhtw.mctg.model.User;
-import at.fhtw.mctg.model.Weather;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

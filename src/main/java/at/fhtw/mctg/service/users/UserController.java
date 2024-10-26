@@ -1,4 +1,4 @@
-package at.fhtw.mctg.service.echo;
+package at.fhtw.mctg.service.users;
 
 import at.fhtw.httpserver.http.ContentType;
 import at.fhtw.httpserver.http.HttpStatus;
