@@ -3,8 +3,8 @@ package at.fhtw.mctg;
 import at.fhtw.httpserver.server.Server;
 import at.fhtw.httpserver.utils.Router;
 import at.fhtw.mctg.service.echo.EchoService;
+import at.fhtw.mctg.service.session.SessionService;
 import at.fhtw.mctg.service.users.UserService;
-import at.fhtw.mctg.service.weather.WeatherService;
 
 import java.io.IOException;
 
@@ -22,7 +22,7 @@ public class Main {
     {
         Router router = new Router();
         router.addService("/users", new UserService());
-        //router.addService("/weather", new WeatherService());
+        router.addService("/sessions", new SessionService());
         router.addService("/echo", new EchoService());
 
         return router;
