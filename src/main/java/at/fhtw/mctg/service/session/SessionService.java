@@ -18,7 +18,7 @@ public class SessionService implements Service {
     @Override
     public Response handleRequest(Request request) {
 
-        // POST -> Create new User
+        // POST -> Create new Session (login)
         if (request.getMethod() == Method.POST) {
             return this.sessionController.createSession(request);
         }
