@@ -1,4 +1,4 @@
-package at.fhtw.mctg.service.battle;
+package at.fhtw.mctg.controller.battle;
 
 import at.fhtw.mctg.controller.Controller;
 

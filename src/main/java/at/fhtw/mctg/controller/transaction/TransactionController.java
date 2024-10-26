@@ -1,4 +1,4 @@
-package at.fhtw.mctg.service.transaction;
+package at.fhtw.mctg.controller.transaction;
 
 import at.fhtw.mctg.controller.Controller;
 

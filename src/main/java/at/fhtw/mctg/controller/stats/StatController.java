@@ -1,4 +1,4 @@
-package at.fhtw.mctg.service.stats;
+package at.fhtw.mctg.controller.stats;
 
 import at.fhtw.mctg.controller.Controller;
 

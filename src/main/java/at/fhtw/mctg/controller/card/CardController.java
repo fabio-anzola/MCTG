@@ -1,4 +1,4 @@
-package at.fhtw.mctg.service.card;
+package at.fhtw.mctg.controller.card;
 
 import at.fhtw.mctg.controller.Controller;
 

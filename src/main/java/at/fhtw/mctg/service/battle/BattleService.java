@@ -6,7 +6,7 @@ import at.fhtw.httpserver.http.Method;
 import at.fhtw.httpserver.server.Request;
 import at.fhtw.httpserver.server.Response;
 import at.fhtw.httpserver.server.Service;
-import at.fhtw.mctg.service.session.SessionController;
+import at.fhtw.mctg.controller.battle.BattleController;
 
 public class BattleService implements Service {
     private final BattleController battleController;

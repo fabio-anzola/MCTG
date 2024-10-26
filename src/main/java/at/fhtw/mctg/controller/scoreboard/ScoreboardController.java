@@ -1,4 +1,4 @@
-package at.fhtw.mctg.service.scoreboard;
+package at.fhtw.mctg.controller.scoreboard;
 
 import at.fhtw.mctg.controller.Controller;
 

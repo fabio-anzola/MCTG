@@ -6,6 +6,7 @@ import at.fhtw.httpserver.http.Method;
 import at.fhtw.httpserver.server.Request;
 import at.fhtw.httpserver.server.Response;
 import at.fhtw.httpserver.server.Service;
+import at.fhtw.mctg.controller.trade.TradeController;
 
 public class TradeService implements Service {
     private final TradeController tradeController;

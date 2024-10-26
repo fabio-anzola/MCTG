@@ -6,7 +6,7 @@ import at.fhtw.httpserver.http.Method;
 import at.fhtw.httpserver.server.Request;
 import at.fhtw.httpserver.server.Response;
 import at.fhtw.httpserver.server.Service;
-import at.fhtw.mctg.service.deck.DeckController;
+import at.fhtw.mctg.controller.deck.DeckController;
 
 public class DeckService implements Service {
     private final DeckController deckController;

@@ -6,6 +6,7 @@ import at.fhtw.httpserver.http.Method;
 import at.fhtw.httpserver.server.Request;
 import at.fhtw.httpserver.server.Response;
 import at.fhtw.httpserver.server.Service;
+import at.fhtw.mctg.controller.users.UserController;
 
 public class UserService implements Service {
     private final UserController userController;

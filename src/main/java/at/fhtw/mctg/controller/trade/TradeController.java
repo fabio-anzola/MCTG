@@ -1,4 +1,4 @@
-package at.fhtw.mctg.service.trade;
+package at.fhtw.mctg.controller.trade;
 
 import at.fhtw.mctg.controller.Controller;
 

@@ -1,4 +1,4 @@
-package at.fhtw.mctg.service.session;
+package at.fhtw.mctg.controller.session;
 
 import at.fhtw.httpserver.http.ContentType;
 import at.fhtw.httpserver.http.HttpStatus;
@@ -12,17 +12,11 @@ import at.fhtw.mctg.model.Session;
 import at.fhtw.mctg.model.Token;
 import at.fhtw.mctg.model.User;
 import at.fhtw.mctg.utils.JWTGenerator;
-import at.fhtw.mctg.utils.PasswordHash;
-
-import javax.crypto.spec.SecretKeySpec;
-import javax.xml.bind.DatatypeConverter;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
 
 import static at.fhtw.mctg.utils.PasswordHash.verifyPassword;
 

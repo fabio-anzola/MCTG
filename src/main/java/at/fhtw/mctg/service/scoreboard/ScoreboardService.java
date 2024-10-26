@@ -6,6 +6,7 @@ import at.fhtw.httpserver.http.Method;
 import at.fhtw.httpserver.server.Request;
 import at.fhtw.httpserver.server.Response;
 import at.fhtw.httpserver.server.Service;
+import at.fhtw.mctg.controller.scoreboard.ScoreboardController;
 
 public class ScoreboardService implements Service {
     private final ScoreboardController scoreboardController;

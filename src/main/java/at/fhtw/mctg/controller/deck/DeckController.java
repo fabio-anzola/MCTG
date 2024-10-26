@@ -1,4 +1,4 @@
-package at.fhtw.mctg.service.deck;
+package at.fhtw.mctg.controller.deck;
 
 import at.fhtw.mctg.controller.Controller;
 
