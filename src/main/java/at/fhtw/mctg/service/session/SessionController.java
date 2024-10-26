@@ -12,6 +12,7 @@ import at.fhtw.mctg.model.Session;
 import at.fhtw.mctg.model.Token;
 import at.fhtw.mctg.model.User;
 import at.fhtw.mctg.utils.JWTGenerator;
+import at.fhtw.mctg.utils.PasswordHash;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
@@ -22,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+
+import static at.fhtw.mctg.utils.PasswordHash.verifyPassword;
 
 public class SessionController extends Controller {
 
@@ -43,7 +46,7 @@ public class SessionController extends Controller {
 
             User user = ((ArrayList<User>) dbUsers).get(0);
 
-            if (!user.getPassword().contentEquals(input.getPassword())) {
+            if (!verifyPassword(input.getPassword(), user.getPassword())) {
                 return new Response(
                         HttpStatus.UNAUTHORIZED,
                         ContentType.JSON,

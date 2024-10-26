@@ -8,6 +8,7 @@ import at.fhtw.mctg.controller.Controller;
 import at.fhtw.mctg.dal.Repository.UserRepository;
 import at.fhtw.mctg.dal.UnitOfWork;
 import at.fhtw.mctg.model.User;
+import at.fhtw.mctg.utils.PasswordHash;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,6 +29,7 @@ public class UserController extends Controller {
                 );
             }
 
+            requestedUser.setPassword(PasswordHash.generateHashedPassword(requestedUser.getPassword()));
             new UserRepository(unitOfWork).createUser(requestedUser);
 
             unitOfWork.commitTransaction();
@@ -113,7 +115,7 @@ public class UserController extends Controller {
                 user.setImage(extractedUser.getImage());
             }
             if (extractedUser.getPassword() != null) {
-                user.setPassword(extractedUser.getPassword());
+                user.setPassword(PasswordHash.generateHashedPassword(extractedUser.getPassword()));
             }
 
             new UserRepository(unitOfWork).updateUserByName(username, user);
