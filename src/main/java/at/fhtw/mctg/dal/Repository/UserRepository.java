@@ -10,6 +10,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import static java.lang.Thread.sleep;
+
 public class UserRepository {
     private UnitOfWork unitOfWork;
 

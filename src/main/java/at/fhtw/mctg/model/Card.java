@@ -2,23 +2,27 @@ package at.fhtw.mctg.model;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 public class Card {
 
-    @JsonAlias({"pk_card_id"})
-    private int cardId;
+    @JsonAlias({"Id"})
+    private String cardId;
 
-    @JsonAlias({"name"})
+    @JsonAlias({"Name"})
     private String name;
 
-    @JsonAlias({"damage"})
+    @JsonAlias({"Damage"})
+    @Setter
     private int damage;
 
     @JsonAlias({"card_type"})
+    @Setter
     private CardType type;
 
     @JsonAlias({"element_type"})
+    @Setter
     private Elements element;
 
     @JsonAlias({"is_active"})
@@ -27,7 +31,8 @@ public class Card {
     @JsonAlias({"fk_pk_user_id"})
     private int userId;
 
-    @JsonAlias({"fk_pk_user_id"})
+    @JsonAlias({"fk_pk_package_id"})
+    @Setter
     private int packageId;
 
     /**
@@ -41,7 +46,7 @@ public class Card {
      * @param userId fk for the owner
      * @param packageId fk for the package
      */
-    public Card(int cardId, String name, int damage, CardType type, Elements element, boolean active, int userId, int packageId) {
+    public Card(String cardId, String name, int damage, CardType type, Elements element, boolean active, int userId, int packageId) {
         this.cardId = cardId;
         this.name = name;
         this.damage = damage;
@@ -50,5 +55,8 @@ public class Card {
         this.active = active;
         this.userId = userId;
         this.packageId = packageId;
+    }
+
+    public Card() {
     }
 }

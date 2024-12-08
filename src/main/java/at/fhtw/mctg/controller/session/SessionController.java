@@ -16,11 +16,21 @@ import at.fhtw.mctg.utils.JWTGenerator;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 import static at.fhtw.mctg.utils.PasswordHash.verifyPassword;
 
 public class SessionController extends Controller {
+
+    public String getUserByToken(Request request) {
+
+        String token = request.getHeaderMap().getHeader("Authorization").split(" ")[1];
+
+        // TODO: change after submission!
+        String[] parts = token.split("-");
+        return parts[0];
+    }
 
     public Response createSession(Request request) {
         UnitOfWork unitOfWork = new UnitOfWork();
