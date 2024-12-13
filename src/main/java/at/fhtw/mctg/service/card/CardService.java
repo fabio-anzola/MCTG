@@ -20,8 +20,14 @@ public class CardService implements Service {
 
         // GET
         if (request.getMethod() == Method.GET) {
-            // TODO: Implement this method
-            return null;
+            if (request.getHeaderMap().getHeader("Authorization") == null) {
+                return new Response(
+                        HttpStatus.UNAUTHORIZED,
+                        ContentType.JSON,
+                        "{ \"message\" : \"Access token is missing or invalid\" }"
+                );
+            }
+            return this.cardController.getCardsByUid(request);
         }
 
         return new Response(
