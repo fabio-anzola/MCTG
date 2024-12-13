@@ -33,6 +33,7 @@ public class User {
     private String image;
 
     @JsonAlias({"Wallet"})
+    @Setter
     private int wallet;
 
     @JsonAlias({"Elo"})

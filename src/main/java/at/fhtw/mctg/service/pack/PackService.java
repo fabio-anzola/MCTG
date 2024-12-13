@@ -51,8 +51,6 @@ public class PackService implements Service {
             }
 
             return this.cardController.addMultipleCards(request, id);
-
-
         }
 
         return new Response(

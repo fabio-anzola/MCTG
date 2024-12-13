@@ -29,10 +29,9 @@ public class Main {
         Router router = new Router();
         router.addService("/users", new UserService());
         router.addService("/sessions", new SessionService());
-
-        // Not yet fully implemented
         router.addService("/packages", new PackService());
-        router.addService("/transactions/packages", new TransactionService());
+        router.addService("/transactions", new TransactionService()); // /transactions/packages
+        // Not yet fully implemented
         router.addService("/cards", new CardService());
         router.addService("/deck", new DeckService());
         router.addService("/stats", new StatService());

@@ -17,11 +17,18 @@ public class TransactionService implements Service {
 
     @Override
     public Response handleRequest(Request request) {
-        
+
         // POST
         if (request.getMethod() == Method.POST) {
-            // TODO: Implement this method
-            return null;
+            if (request.getHeaderMap().getHeader("Authorization") == null) {
+                return new Response(
+                        HttpStatus.UNAUTHORIZED,
+                        ContentType.JSON,
+                        "{ \"message\" : \"Access token is missing or invalid\" }"
+                );
+            }
+
+            return this.transactionController.acquirePack(request);
         }
 
         return new Response(

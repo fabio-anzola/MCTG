@@ -85,6 +85,22 @@ public class UserRepository {
         }
     }
 
+    public void updateWalletByName(String username, int change) {
+        int current = ((ArrayList<User>)getUserByName(username)).get(0).getWallet();
+        try (PreparedStatement preparedStatement = this.unitOfWork.prepareStatement(
+                """
+                        UPDATE "user" SET wallet = ? WHERE username = ?
+                        """)) {
+            preparedStatement.setInt(1, (current + change));
+            preparedStatement.setString(2, username);
+
+            preparedStatement.execute();
+
+        } catch (SQLException e) {
+            throw new DataAccessException("Update not successful", e);
+        }
+    }
+
 //    public Collection<Weather> findAllWeather() {
 //        try (PreparedStatement preparedStatement =
 //                     this.unitOfWork.prepareStatement("""

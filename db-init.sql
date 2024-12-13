@@ -27,6 +27,17 @@ CREATE TYPE elementTypes AS ENUM (
     'WATER',
     'NORMAL'
     );
+   
+CREATE TYPE battleStatus AS ENUM (
+    'WIN',
+    'LOSS',
+    'TIE'
+    );
+   
+CREATE TYPE tradeStatus AS ENUM (
+    'PENDING',
+    'ACCEPTED'
+    );
 
 
 CREATE TABLE "user"
@@ -49,28 +60,28 @@ CREATE TABLE "token"
     token         TEXT        NOT NULL,
     expires       TIMESTAMPTZ NOT NULL,
     created       TIMESTAMPTZ NOT NULL,
-    fk_pk_user_id SERIAL REFERENCES "user" (pk_user_id) ON DELETE CASCADE,
+    fk_pk_user_id INTEGER REFERENCES "user" (pk_user_id) ON DELETE CASCADE,
     PRIMARY KEY (pk_token_id)
 );
 
 CREATE TABLE "package"
 (
     pk_package_id SERIAL,
-    name          TEXT     NOT NULL,
-    price         SMALLINT NOT NULL,
+    name          TEXT,
+    price         SMALLINT NOT NULL DEFAULT 5,
     PRIMARY KEY (pk_package_id)
 );
 
 CREATE TABLE "card"
 (
-    pk_card_id       SERIAL,
+    pk_card_id       TEXT,
     name             TEXT     NOT NULL,
-    damage           SMALLINT NOT NULL,
+    damage           SMALLINT default 0,
     card_type        cardTypes,
     element_type     elementTypes,
     is_active        BOOLEAN  NOT NULL DEFAULT FALSE,
-    fk_pk_user_id    SERIAL REFERENCES "user" (pk_user_id) ON DELETE CASCADE,
-    fk_pk_package_id SERIAL REFERENCES "package" (pk_package_id) ON DELETE CASCADE,
+    fk_pk_user_id    INTEGER REFERENCES "user" (pk_user_id) ON DELETE CASCADE,
+    fk_pk_package_id INTEGER REFERENCES "package" (pk_package_id) ON DELETE CASCADE,
     PRIMARY KEY (pk_card_id)
 );
 
@@ -89,37 +100,26 @@ CREATE TABLE "battle"
     time_start         TIMESTAMPTZ NOT NULL,
     time_end           TIMESTAMPTZ NOT NULL,
     rounds_nr          INTEGER,
-    fk_pk_battlelog_id SERIAL REFERENCES "battlelog" (pk_battlelog_id) ON DELETE CASCADE,
+    fk_pk_battlelog_id INTEGER REFERENCES "battlelog" (pk_battlelog_id) ON DELETE CASCADE,
     log_text           TEXT        NOT NULL,
     PRIMARY KEY (pk_battle_id)
 );
 
-CREATE TYPE battleStatus AS ENUM (
-    'WIN',
-    'LOSS',
-    'TIE'
-    );
-
 CREATE TABLE "user_battle"
 (
     status          battleStatus NOT NULL,
-    fk_pk_user_id   SERIAL REFERENCES "user" (pk_user_id) ON DELETE CASCADE,
-    fk_pk_battle_id SERIAL REFERENCES "battle" (pk_battle_id) ON DELETE CASCADE,
+    fk_pk_user_id   INTEGER REFERENCES "user" (pk_user_id) ON DELETE CASCADE,
+    fk_pk_battle_id INTEGER REFERENCES "battle" (pk_battle_id) ON DELETE CASCADE,
     PRIMARY KEY (fk_pk_user_id, fk_pk_battle_id)
 );
-
-CREATE TYPE tradeStatus AS ENUM (
-    'PENDING',
-    'ACCEPTED'
-    );
 
 CREATE TABLE "trade"
 (
     pk_trade_id           SERIAL      NOT NULL,
     fk_pk_initiator_id    SERIAL REFERENCES "user" (pk_user_id) ON DELETE CASCADE,
     fk_pk_tradepartner_id SERIAL REFERENCES "user" (pk_user_id) ON DELETE CASCADE,
-    fk_pk_sendercard_id   SERIAL REFERENCES "card" (pk_card_id) ON DELETE CASCADE,
-    fk_pk_receivercard_id SERIAL REFERENCES "card" (pk_card_id) ON DELETE CASCADE,
+    fk_pk_sendercard_id   TEXT REFERENCES "card" (pk_card_id) ON DELETE CASCADE,
+    fk_pk_receivercard_id TEXT REFERENCES "card" (pk_card_id) ON DELETE CASCADE,
     status                tradeStatus NOT NULL,
     time_start            TIMESTAMPTZ NOT NULL,
     time_completed        TIMESTAMPTZ NOT NULL,
