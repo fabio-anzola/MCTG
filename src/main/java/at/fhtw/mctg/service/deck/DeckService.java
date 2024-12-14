@@ -13,6 +13,7 @@ public class DeckService implements Service {
 
     public DeckService() {
         this.deckController = new DeckController();
+
     }
 
     @Override
@@ -20,13 +21,25 @@ public class DeckService implements Service {
 
         // GET
         if (request.getMethod() == Method.GET) {
-            // TODO: Implement this method
-            return null;
+            if (request.getHeaderMap().getHeader("Authorization") == null) {
+                return new Response(
+                        HttpStatus.UNAUTHORIZED,
+                        ContentType.JSON,
+                        "{ \"message\" : \"Access token is missing or invalid\" }"
+                );
+            }
+            return this.deckController.getActiveCards(request);
         }
         // PUT
         if (request.getMethod() == Method.PUT) {
-            // TODO: Implement this method
-            return null;
+            if (request.getHeaderMap().getHeader("Authorization") == null) {
+                return new Response(
+                        HttpStatus.UNAUTHORIZED,
+                        ContentType.JSON,
+                        "{ \"message\" : \"Access token is missing or invalid\" }"
+                );
+            }
+            return this.deckController.setActiveCards(request);
         }
 
         return new Response(
