@@ -5,6 +5,7 @@ import at.fhtw.httpserver.http.HttpStatus;
 import at.fhtw.httpserver.server.Request;
 import at.fhtw.httpserver.server.Response;
 import at.fhtw.mctg.controller.Controller;
+import at.fhtw.mctg.controller.session.SessionController;
 import at.fhtw.mctg.dal.Repository.UserRepository;
 import at.fhtw.mctg.dal.UnitOfWork;
 import at.fhtw.mctg.model.User;
@@ -88,11 +89,18 @@ public class UserController extends Controller {
         UnitOfWork unitOfWork = new UnitOfWork();
 
         try (unitOfWork) {
+            String requestingUser = new SessionController().getUserByToken(request);
+            ArrayList<User> tokenUsers = ((ArrayList<User>) new UserRepository(unitOfWork).getUserByName(requestingUser));
+            if (tokenUsers.isEmpty()) {
+                return new Response(
+                        HttpStatus.FORBIDDEN,
+                        ContentType.JSON,
+                        "{ \"message\" : \"Token Not Accepted\" }"
+                );
+            }
 
-            User extractedUser = this.getObjectMapper().readValue(request.getBody(), User.class);
 
-            Collection<User> dbUsers = new UserRepository(unitOfWork).getUserByName(username);
-
+            Collection<User> dbUsers = new UserRepository(unitOfWork).getUserByName(requestingUser);
             if (dbUsers.isEmpty()) {
                 unitOfWork.rollbackTransaction();
                 return new Response(
@@ -103,6 +111,18 @@ public class UserController extends Controller {
             }
 
             User user = ((ArrayList<User>)dbUsers).get(0);
+
+            if (!user.getUsername().equals(username)) {
+                System.out.println("ee");
+                return new Response(
+                        HttpStatus.FORBIDDEN,
+                        ContentType.JSON,
+                        "{ \"message\" : \"Cannot update other user\" }"
+                );
+            }
+
+
+            User extractedUser = this.getObjectMapper().readValue(request.getBody(), User.class);
 
             // update values possible for bio, name, image, password
             if (extractedUser.getBio() != null) {
