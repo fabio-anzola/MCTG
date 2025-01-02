@@ -2,6 +2,7 @@ package at.fhtw.mctg.dal.Repository;
 
 import at.fhtw.mctg.dal.DataAccessException;
 import at.fhtw.mctg.dal.UnitOfWork;
+import at.fhtw.mctg.model.Stats;
 import at.fhtw.mctg.model.User;
 
 import java.sql.PreparedStatement;
@@ -129,6 +130,47 @@ public class UserRepository {
             stats.add(resultSet.getInt(6)); // total ties
 
             return stats;
+        } catch (SQLException e) {
+            throw new DataAccessException("Select not successful", e);
+        }
+    }
+
+    public Collection<Stats> getOrderedStats() {
+        try (PreparedStatement preparedStatement = this.unitOfWork.prepareStatement(
+                """
+                            SELECT
+                                u.username,
+                                u.name,
+                                u.pk_user_id,
+                                u.elo,
+                                SUM(CASE WHEN ub.status = 'WIN' THEN 1 ELSE 0 END) AS total_wins,
+                                SUM(CASE WHEN ub.status = 'LOSS' THEN 1 ELSE 0 END) AS total_losses,
+                                SUM(CASE WHEN ub.status = 'TIE' THEN 1 ELSE 0 END) AS total_ties
+                            FROM "user" u
+                            LEFT JOIN "user_battle" ub ON u.pk_user_id = ub.fk_pk_user_id
+                            GROUP BY u.pk_user_id, u.username, u.elo
+                            ORDER BY elo desc;
+                        """)) {
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            resultSet.next();
+
+            Collection<Stats> scoreboard = new ArrayList<>();
+
+            while (resultSet.next()) {
+                Stats stats = new Stats(
+                        resultSet.getString(1), // username
+                        resultSet.getString(2), // name
+                        resultSet.getInt(4), // elo
+                        resultSet.getInt(5), // wins
+                        resultSet.getInt(6), // losses
+                        resultSet.getInt(7) // ties
+                );
+
+                scoreboard.add(stats);
+            }
+
+            return scoreboard;
         } catch (SQLException e) {
             throw new DataAccessException("Select not successful", e);
         }
