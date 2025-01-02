@@ -102,12 +102,13 @@ public class UserRepository {
         }
     }
 
-    public Collection<Integer> getUserStatsByName(String username) {
+    public Stats getUserStatsByName(String username) {
         try (PreparedStatement preparedStatement = this.unitOfWork.prepareStatement(
                 """
                             SELECT
                                 u.pk_user_id,
                                 u.username,
+                                u.name,
                                 u.elo,
                                 SUM(CASE WHEN ub.status = 'WIN' THEN 1 ELSE 0 END) AS total_wins,
                                 SUM(CASE WHEN ub.status = 'LOSS' THEN 1 ELSE 0 END) AS total_losses,
@@ -121,15 +122,17 @@ public class UserRepository {
             preparedStatement.setString(1, username);
 
             ResultSet resultSet = preparedStatement.executeQuery();
+
             resultSet.next();
 
-            ArrayList<Integer> stats = new ArrayList<>();
-            stats.add(resultSet.getInt(3)); // elo
-            stats.add(resultSet.getInt(4)); // total wins
-            stats.add(resultSet.getInt(5)); // total losses
-            stats.add(resultSet.getInt(6)); // total ties
-
-            return stats;
+            return new Stats(
+                    resultSet.getString(2), // username
+                    resultSet.getString(3), // name
+                    resultSet.getInt(4), // elo
+                    resultSet.getInt(5), // wins
+                    resultSet.getInt(6), // losses
+                    resultSet.getInt(7) // ties
+            );
         } catch (SQLException e) {
             throw new DataAccessException("Select not successful", e);
         }

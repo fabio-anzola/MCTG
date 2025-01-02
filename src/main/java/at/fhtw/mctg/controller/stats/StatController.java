@@ -10,6 +10,7 @@ import at.fhtw.mctg.dal.Repository.CardRepository;
 import at.fhtw.mctg.dal.Repository.UserRepository;
 import at.fhtw.mctg.dal.UnitOfWork;
 import at.fhtw.mctg.model.Card;
+import at.fhtw.mctg.model.Stats;
 import at.fhtw.mctg.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -33,22 +34,16 @@ public class StatController extends Controller {
 
             User user = users.get(0);
 
-            ArrayList<Integer> stats = ((ArrayList<Integer>)new UserRepository(unitOfWork).getUserStatsByName(requestingUser));
-
-            String json = String.format(
-                    "{ \"Name\": \"%s\", \"Elo\": %d, \"Wins\": %d, \"Losses\": %d}",
-                    user.getName(),
-                    stats.get(0), // ELO
-                    stats.get(1), // WINS
-                    stats.get(2) // LOSS
-            );
+            Stats stats = new UserRepository(unitOfWork).getUserStatsByName(requestingUser);
 
             unitOfWork.commitTransaction();
 
+            ObjectMapper objectMapper = new ObjectMapper();
+            String sbJson = objectMapper.writeValueAsString(stats);
             return new Response(
                     HttpStatus.OK,
                     ContentType.JSON,
-                    json
+                    sbJson
             );
 
         } catch (Exception e) {
