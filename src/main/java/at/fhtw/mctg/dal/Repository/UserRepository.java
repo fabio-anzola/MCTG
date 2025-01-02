@@ -156,7 +156,6 @@ public class UserRepository {
                         """)) {
 
             ResultSet resultSet = preparedStatement.executeQuery();
-            resultSet.next();
 
             Collection<Stats> scoreboard = new ArrayList<>();
 
