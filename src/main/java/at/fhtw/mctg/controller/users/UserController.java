@@ -113,7 +113,6 @@ public class UserController extends Controller {
             User user = ((ArrayList<User>)dbUsers).get(0);
 
             if (!user.getUsername().equals(username)) {
-                System.out.println("ee");
                 return new Response(
                         HttpStatus.FORBIDDEN,
                         ContentType.JSON,

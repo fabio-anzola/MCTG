@@ -101,6 +101,39 @@ public class UserRepository {
         }
     }
 
+    public Collection<Integer> getUserStatsByName(String username) {
+        try (PreparedStatement preparedStatement = this.unitOfWork.prepareStatement(
+                """
+                            SELECT
+                                u.pk_user_id,
+                                u.username,
+                                u.elo,
+                                SUM(CASE WHEN ub.status = 'WIN' THEN 1 ELSE 0 END) AS total_wins,
+                                SUM(CASE WHEN ub.status = 'LOSS' THEN 1 ELSE 0 END) AS total_losses,
+                                SUM(CASE WHEN ub.status = 'TIE' THEN 1 ELSE 0 END) AS total_ties
+                            FROM "user" u
+                            LEFT JOIN "user_battle" ub ON u.pk_user_id = ub.fk_pk_user_id
+                            WHERE u.username = ?
+                            GROUP BY u.pk_user_id, u.username, u.elo;
+                        """)) {
+
+            preparedStatement.setString(1, username);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            resultSet.next();
+
+            ArrayList<Integer> stats = new ArrayList<>();
+            stats.add(resultSet.getInt(3)); // elo
+            stats.add(resultSet.getInt(4)); // total wins
+            stats.add(resultSet.getInt(5)); // total losses
+            stats.add(resultSet.getInt(6)); // total ties
+
+            return stats;
+        } catch (SQLException e) {
+            throw new DataAccessException("Select not successful", e);
+        }
+    }
+
 //    public Collection<Weather> findAllWeather() {
 //        try (PreparedStatement preparedStatement =
 //                     this.unitOfWork.prepareStatement("""
