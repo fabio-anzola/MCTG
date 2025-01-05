@@ -68,16 +68,46 @@ public class UserRepository {
         }
     }
 
+    public User getUserById(int userId) {
+        try (PreparedStatement preparedStatement = this.unitOfWork.prepareStatement(
+                """
+                            select * from "user" where pk_user_id = ?
+                        """)) {
+
+            preparedStatement.setInt(1, userId);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                return new User(
+                        resultSet.getInt(1), // ID
+                        resultSet.getString(2), // username
+                        resultSet.getString(3), // password
+                        resultSet.getString(4), // name
+                        resultSet.getString(5), // bio
+                        resultSet.getString(6), // image
+                        resultSet.getInt(7), // wallet
+                        resultSet.getInt(8) // elo
+                );
+            }
+
+            return null;
+        } catch (SQLException e) {
+            throw new DataAccessException("Select not successful", e);
+        }
+    }
+
     public void updateUserByName(String username, User user) {
         try (PreparedStatement preparedStatement = this.unitOfWork.prepareStatement(
                 """
-                        UPDATE "user" SET bio = ?, name = ?, image = ?, password = ? WHERE username = ?
+                        UPDATE "user" SET bio = ?, name = ?, image = ?, password = ?, elo = ? WHERE username = ?
                         """)) {
             preparedStatement.setString(1, user.getBio());
             preparedStatement.setString(2, user.getName());
             preparedStatement.setString(3, user.getImage());
             preparedStatement.setString(4, user.getPassword());
-            preparedStatement.setString(5, username);
+            preparedStatement.setInt(5, user.getElo());
+            preparedStatement.setString(6, username);
 
             preparedStatement.execute();
 
