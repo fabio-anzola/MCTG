@@ -41,19 +41,18 @@ public class CardController extends Controller {
                 requestedCard.setPackageId(packId);
                 if (requestedCard.getName().contains("Spell")) {
                     requestedCard.setType(CardType.SPELL);
-
-                    if (requestedCard.getName().contains("Water")) {
-                        requestedCard.setElement(Elements.WATER);
-                    }
-                    else if (requestedCard.getName().contains("Fire")) {
-                        requestedCard.setElement(Elements.FIRE);
-                    }
-                    else {
-                        requestedCard.setElement(Elements.NORMAL);
-                    }
                 }
                 else {
                     requestedCard.setType(CardType.MONSTER);
+                }
+
+                if (requestedCard.getName().contains("Water")) {
+                    requestedCard.setElement(Elements.WATER);
+                }
+                else if (requestedCard.getName().contains("Fire")) {
+                    requestedCard.setElement(Elements.FIRE);
+                }
+                else {
                     requestedCard.setElement(Elements.NORMAL);
                 }
 
