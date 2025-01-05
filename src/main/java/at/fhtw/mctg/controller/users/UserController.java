@@ -54,13 +54,43 @@ public class UserController extends Controller {
     }
 
     public Response getUserByName(Request request) {
-        String username = request.getPathParts().get(1);
+        String username = request.getPathParts().get(1); //the user we want to see
 
         UnitOfWork unitOfWork = new UnitOfWork();
 
         try (unitOfWork) {
+            String requestingUser = new SessionController().getUserByToken(request);
+            ArrayList<User> tokenUsers = ((ArrayList<User>) new UserRepository(unitOfWork).getUserByName(requestingUser));
+            if (tokenUsers.isEmpty()) {
+                return new Response(
+                        HttpStatus.FORBIDDEN,
+                        ContentType.JSON,
+                        "{ \"message\" : \"Token Not Accepted\" }"
+                );
+            }
+
+
+            Collection<User> dbUsers = new UserRepository(unitOfWork).getUserByName(requestingUser);
+            if (dbUsers.isEmpty()) {
+                unitOfWork.rollbackTransaction();
+                return new Response(
+                        HttpStatus.NOT_FOUND,
+                        ContentType.JSON,
+                        "{ \"message\" : \"User not found\" }"
+                );
+            }
+
+            User user = ((ArrayList<User>)dbUsers).get(0);
+            if (!user.getUsername().equals(username)) {
+                return new Response(
+                        HttpStatus.FORBIDDEN,
+                        ContentType.JSON,
+                        "{ \"message\" : \"Cannot get other user\" }"
+                );
+            }
 
             User reqUser = ((ArrayList<User>)new UserRepository(unitOfWork).getUserByName(username)).get(0);
+
             String UserDataJSON = this.getObjectMapper().writeValueAsString(reqUser);
 
             unitOfWork.commitTransaction();
