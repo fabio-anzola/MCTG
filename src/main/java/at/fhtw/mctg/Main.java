@@ -34,8 +34,8 @@ public class Main {
         router.addService("/cards", new CardService());
         router.addService("/deck", new DeckService());
         router.addService("/stats", new StatService());
-        // Not yet fully implemented
         router.addService("/scoreboard", new ScoreboardService());
+        // Not yet fully implemented
         router.addService("/battles", new BattleService());
         router.addService("/tradings", new TradeService());
 
