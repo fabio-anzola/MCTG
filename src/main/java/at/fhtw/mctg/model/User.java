@@ -37,6 +37,7 @@ public class User {
     private int wallet;
 
     @JsonAlias({"Elo"})
+    @Setter
     private int elo;
 
     /**
