@@ -49,7 +49,13 @@ public class DeckController extends Controller {
             ObjectMapper objectMapper = new ObjectMapper();
             String cardsJson = objectMapper.writeValueAsString(cards);
 
-            if (request.getParams().contains("format=plain")) {
+            if (request.getParams() == null) {
+                return new Response(
+                        HttpStatus.OK,
+                        ContentType.JSON,
+                        cardsJson
+                );
+            } else if (request.getParams().contains("format=plain")) {
                 return new Response(
                         HttpStatus.OK,
                         ContentType.PLAIN_TEXT,
@@ -57,9 +63,9 @@ public class DeckController extends Controller {
                 );
             } else {
                 return new Response(
-                        HttpStatus.OK,
+                        HttpStatus.BAD_REQUEST,
                         ContentType.JSON,
-                        cardsJson
+                        "{ \"message\" : \"Unsupported format type\" }"
                 );
             }
 
