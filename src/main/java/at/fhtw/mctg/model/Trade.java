@@ -3,6 +3,8 @@ package at.fhtw.mctg.model;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Getter;
 
+import java.sql.Timestamp;
+
 @Getter
 public class Trade {
 
@@ -16,21 +18,27 @@ public class Trade {
     private int partnerId;
 
     @JsonAlias({"senderCardId"})
-    private int senderCardId;
+    private String senderCardId;
 
     @JsonAlias({"receiverCardId"})
-    private int receiverCardId;
+    private String receiverCardId;
 
     @JsonAlias({"status"})
     private TradeStatus status;
 
     @JsonAlias({"timeCreated"})
-    private String timeCreated;
+    private Timestamp timeCreated;
 
     @JsonAlias({"timeCompleted"})
-    private String timeCompleted;
+    private Timestamp timeCompleted;
 
-    public Trade(int tradeId, int initiatorId, int partnerId, int senderCardId, int receiverCardId, TradeStatus status, String timeCreated, String timeCompleted) {
+    @JsonAlias({"requestedType"})
+    private CardType requestedType;
+
+    @JsonAlias({"requestedDamage"})
+    private int requestedDamage;
+
+    public Trade(int tradeId, int initiatorId, int partnerId, String senderCardId, String receiverCardId, TradeStatus status, Timestamp timeCreated, Timestamp timeCompleted, CardType requestedType, int requestedDamage) {
         this.tradeId = tradeId;
         this.initiatorId = initiatorId;
         this.partnerId = partnerId;
@@ -39,6 +47,8 @@ public class Trade {
         this.status = status;
         this.timeCreated = timeCreated;
         this.timeCompleted = timeCompleted;
+        this.requestedType = requestedType;
+        this.requestedDamage = requestedDamage;
     }
 
     public Trade() {
