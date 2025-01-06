@@ -6,12 +6,11 @@ import at.fhtw.httpserver.server.Request;
 import at.fhtw.httpserver.server.Response;
 import at.fhtw.mctg.controller.Controller;
 import at.fhtw.mctg.controller.session.SessionController;
+import at.fhtw.mctg.dal.Repository.CardRepository;
 import at.fhtw.mctg.dal.Repository.TradeRepository;
 import at.fhtw.mctg.dal.Repository.UserRepository;
 import at.fhtw.mctg.dal.UnitOfWork;
-import at.fhtw.mctg.model.Stats;
-import at.fhtw.mctg.model.Trade;
-import at.fhtw.mctg.model.User;
+import at.fhtw.mctg.model.*;
 import at.fhtw.mctg.service.trade.TradeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -52,6 +51,104 @@ public class TradeController extends Controller {
             String sbJson = objectMapper.writeValueAsString(trades);
             return new Response(
                     HttpStatus.OK,
+                    ContentType.JSON,
+                    sbJson
+            );
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            unitOfWork.rollbackTransaction();
+            return new Response(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    ContentType.JSON,
+                    "{ \"message\" : \"Internal Server Error\" }"
+            );
+        }
+    }
+
+    public Response createNewTrade(Request request) {
+        // check if user is valid
+        // check if card belongs to user
+        // check if card is active (in deck)
+        // check if there is already a trade with the card
+
+        UnitOfWork unitOfWork = new UnitOfWork();
+        try (unitOfWork) {
+            String requestingUser = new SessionController().getUserByToken(request);
+
+            ArrayList<User> users = ((ArrayList<User>)new UserRepository(unitOfWork).getUserByName(requestingUser));
+            if (users.isEmpty()) {
+                return new Response(
+                        HttpStatus.FORBIDDEN,
+                        ContentType.JSON,
+                        "{ \"message\" : \"Token Not Accepted\" }"
+                );
+            }
+
+            // User Data of requesting user
+            User user = users.get(0);
+
+            Trade reqTrade = this.getObjectMapper().readValue(request.getBody(), Trade.class);
+
+            // Check if card exists
+            ArrayList<Card> tradeCards = (ArrayList<Card>) new CardRepository(unitOfWork).getCardById(reqTrade.getSenderCardId());
+            if (tradeCards.size() != 1) {
+                return new Response(
+                        HttpStatus.FORBIDDEN,
+                        ContentType.JSON,
+                        "{ \"message\" : \"Requested card is invalid\" }"
+                );
+            }
+
+            // Check if user is owner
+            Card card = tradeCards.get(0);
+            if (card.getUserId() != user.getUserId()) {
+                return new Response(
+                        HttpStatus.FORBIDDEN,
+                        ContentType.JSON,
+                        "{ \"message\" : \"The deal contains a card that is not owned by the user or locked in the deck.\" }"
+                );
+            }
+
+            // Check if Card is in deck
+            if (card.isActive()) {
+                return new Response(
+                        HttpStatus.FORBIDDEN,
+                        ContentType.JSON,
+                        "{ \"message\" : \"The deal contains a card that is not owned by the user or locked in the deck.\" }"
+                );
+            }
+
+            // Check if there is already a trade with this card pending
+            if (!new TradeRepository(unitOfWork).getPendingTradeByCard(card.getCardId()).isEmpty()) {
+                return new Response(
+                        HttpStatus.FORBIDDEN,
+                        ContentType.JSON,
+                        "{ \"message\" : \"The deal contains a card that is already in another trade.\" }"
+                );
+            }
+
+            // Check if there is already a trade with this id
+            if (!new TradeRepository(unitOfWork).getTradeById(reqTrade.getTradeId()).isEmpty()) {
+                return new Response(
+                        HttpStatus.FORBIDDEN,
+                        ContentType.JSON,
+                        "{ \"message\" : \"A deal with this deal ID already exists.\" }"
+                );
+            }
+
+            // Create trade
+            reqTrade.setStatus(TradeStatus.PENDING);
+            reqTrade.setInitiatorId(user.getUserId());
+            Trade trade = new TradeRepository(unitOfWork).createTrade(reqTrade);
+
+            unitOfWork.commitTransaction();
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            String sbJson = objectMapper.writeValueAsString(trade);
+            return new Response(
+                    HttpStatus.CREATED,
                     ContentType.JSON,
                     sbJson
             );

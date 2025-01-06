@@ -31,8 +31,14 @@ public class TradeService implements Service {
         }
         // POST
         if (request.getMethod() == Method.POST) {
-            // TODO: Implement this method
-            return null;
+            if (request.getHeaderMap().getHeader("Authorization") == null) {
+                return new Response(
+                        HttpStatus.UNAUTHORIZED,
+                        ContentType.JSON,
+                        "{ \"message\" : \"Access token is missing or invalid\" }"
+                );
+            }
+            return tradeController.createNewTrade(request);
         }
         // DELETE with Argument
         if (request.getMethod() == Method.DELETE && request.getPathParts().size() > 1) {
