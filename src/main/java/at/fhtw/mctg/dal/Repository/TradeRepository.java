@@ -42,15 +42,15 @@ public class TradeRepository {
 
             while (resultSet.next()) {
                 Trade trade = new Trade(
-                        resultSet.getInt("pk_trade_id"),
+                        resultSet.getString("pk_trade_id"),
                         resultSet.getInt("fk_pk_initiator_id"),
                         resultSet.getInt("fk_pk_tradepartner_id"),
                         resultSet.getString("fk_pk_sendercard_id"),
                         resultSet.getString("fk_pk_receivercard_id"),
-                        TradeStatus.valueOf(resultSet.getString("status")), // Enum mapping
+                        TradeStatus.valueOf(resultSet.getString("status")),
                         resultSet.getTimestamp("time_start"),
                         resultSet.getTimestamp("time_completed"),
-                        CardType.valueOf(resultSet.getString("requested_type")), // Enum mapping
+                        CardType.valueOf(resultSet.getString("requested_type")),
                         resultSet.getInt("requested_damage")
                 );
                 rows.add(trade);
@@ -59,6 +59,151 @@ public class TradeRepository {
             return rows;
         } catch (SQLException e) {
             throw new DataAccessException("Select not successful", e);
+        }
+    }
+
+    public Collection<Trade> getPendingTradeByCard(String cardId) {
+        try (PreparedStatement preparedStatement = this.unitOfWork.prepareStatement(
+                """
+                            SELECT
+                               pk_trade_id,
+                               fk_pk_initiator_id,
+                               fk_pk_tradepartner_id,
+                               fk_pk_sendercard_id,
+                               fk_pk_receivercard_id,
+                               status,
+                               time_start,
+                               time_completed,
+                               requested_type,
+                               requested_damage
+                           FROM "trade"
+                           WHERE status = 'PENDING' AND fk_pk_sendercard_id = ?
+                        """)) {
+
+            preparedStatement.setString(1, cardId);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            Collection<Trade> pendingTrades = new ArrayList<>();
+
+            while (resultSet.next()) {
+                Trade trade = new Trade(
+                        resultSet.getString("pk_trade_id"),
+                        resultSet.getInt("fk_pk_initiator_id"),
+                        resultSet.getInt("fk_pk_tradepartner_id"),
+                        resultSet.getString("fk_pk_sendercard_id"),
+                        resultSet.getString("fk_pk_receivercard_id"),
+                        TradeStatus.valueOf(resultSet.getString("status")),
+                        resultSet.getTimestamp("time_start"),
+                        resultSet.getTimestamp("time_completed"),
+                        CardType.valueOf(resultSet.getString("requested_type")),
+                        resultSet.getInt("requested_damage")
+                );
+                pendingTrades.add(trade);
+            }
+            return pendingTrades;
+        } catch (SQLException e) {
+            throw new DataAccessException("Select not successful", e);
+        }
+    }
+
+    public Collection<Trade> getTradeById(String id) {
+        try (PreparedStatement preparedStatement = this.unitOfWork.prepareStatement(
+                """
+                SELECT
+                   pk_trade_id,
+                   fk_pk_initiator_id,
+                   fk_pk_tradepartner_id,
+                   fk_pk_sendercard_id,
+                   fk_pk_receivercard_id,
+                   status,
+                   time_start,
+                   time_completed,
+                   requested_type,
+                   requested_damage
+                FROM "trade"
+                WHERE pk_trade_id = ?
+                """
+        )) {
+            preparedStatement.setString(1, id);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            Collection<Trade> rows = new ArrayList<>();
+
+            while (resultSet.next()) {
+                Trade trade = new Trade(
+                        resultSet.getString("pk_trade_id"),
+                        resultSet.getInt("fk_pk_initiator_id"),
+                        resultSet.getInt("fk_pk_tradepartner_id"),
+                        resultSet.getString("fk_pk_sendercard_id"),
+                        resultSet.getString("fk_pk_receivercard_id"),
+                        TradeStatus.valueOf(resultSet.getString("status")),
+                        resultSet.getTimestamp("time_start"),
+                        resultSet.getTimestamp("time_completed"),
+                        CardType.valueOf(resultSet.getString("requested_type")),
+                        resultSet.getInt("requested_damage")
+                );
+                rows.add(trade);
+            }
+
+            return rows;
+        } catch (SQLException e) {
+            throw new DataAccessException("Select not successful for trade ID: " + id, e);
+        }
+    }
+
+    public Trade createTrade(Trade trade) {
+        try (PreparedStatement preparedStatement = this.unitOfWork.prepareStatement(
+                """
+                INSERT INTO "trade" (
+                    pk_trade_id,
+                    fk_pk_initiator_id,
+                    fk_pk_sendercard_id,
+                    status,
+                    requested_type,
+                    requested_damage
+                ) VALUES (?, ?, ?, ?::tradestatus, ?::cardtypes, ?)
+                RETURNING 
+                    pk_trade_id,
+                    fk_pk_initiator_id,
+                    fk_pk_tradepartner_id,
+                    fk_pk_sendercard_id,
+                    fk_pk_receivercard_id,
+                    status,
+                    time_start,
+                    time_completed,
+                    requested_type,
+                    requested_damage
+                """
+        )) {
+            preparedStatement.setString(1, trade.getTradeId());
+            preparedStatement.setInt(2, trade.getInitiatorId());
+            preparedStatement.setString(3, trade.getSenderCardId());
+            preparedStatement.setString(4, trade.getStatus().name());
+            preparedStatement.setString(5, trade.getRequestedType().name());
+            preparedStatement.setInt(6, trade.getRequestedDamage());
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                return new Trade(
+                        resultSet.getString("pk_trade_id"),
+                        resultSet.getInt("fk_pk_initiator_id"),
+                        resultSet.getInt("fk_pk_tradepartner_id"),
+                        resultSet.getString("fk_pk_sendercard_id"),
+                        resultSet.getString("fk_pk_receivercard_id"),
+                        TradeStatus.valueOf(resultSet.getString("status")),
+                        resultSet.getTimestamp("time_start"),
+                        resultSet.getTimestamp("time_completed"),
+                        CardType.valueOf(resultSet.getString("requested_type")),
+                        resultSet.getInt("requested_damage")
+                );
+            } else {
+                throw new DataAccessException("Failed to create trade");
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Failed to insert trade into the database", e);
         }
     }
 }
