@@ -40,6 +40,14 @@ public class TradeController extends Controller {
 
             unitOfWork.commitTransaction();
 
+            if (trades.isEmpty()) {
+                return new Response(
+                        HttpStatus.NO_CONTENT,
+                        ContentType.JSON,
+                        "{ \"message\" : \"The request was fine, but there are no trading deals available\" }"
+                );
+            }
+
             ObjectMapper objectMapper = new ObjectMapper();
             String sbJson = objectMapper.writeValueAsString(trades);
             return new Response(
