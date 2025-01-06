@@ -206,4 +206,23 @@ public class TradeRepository {
             throw new DataAccessException("Failed to insert trade into the database", e);
         }
     }
+
+    public void deleteTradeById(String tradeId) {
+        try (PreparedStatement preparedStatement = this.unitOfWork.prepareStatement(
+                """
+                DELETE FROM "trade"
+                WHERE pk_trade_id = ?
+                """
+        )) {
+            preparedStatement.setString(1, tradeId);
+
+            int rowsAffected = preparedStatement.executeUpdate();
+
+            if (rowsAffected == 0) {
+                throw new DataAccessException("No trade found with ID: " + tradeId);
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Failed to delete trade with ID: " + tradeId, e);
+        }
+    }
 }

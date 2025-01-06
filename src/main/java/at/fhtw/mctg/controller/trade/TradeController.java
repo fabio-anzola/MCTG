@@ -15,6 +15,7 @@ import at.fhtw.mctg.service.trade.TradeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 public class TradeController extends Controller {
     public Response getAvailableTrades(Request request) {
@@ -151,6 +152,68 @@ public class TradeController extends Controller {
                     HttpStatus.CREATED,
                     ContentType.JSON,
                     sbJson
+            );
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            unitOfWork.rollbackTransaction();
+            return new Response(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    ContentType.JSON,
+                    "{ \"message\" : \"Internal Server Error\" }"
+            );
+        }
+    }
+
+    public Response deleteTrade(Request request) {
+        String tradeId = request.getPathParts().get(1); //the trade we want to delete
+
+        UnitOfWork unitOfWork = new UnitOfWork();
+
+        try (unitOfWork) {
+            String requestingUser = new SessionController().getUserByToken(request);
+
+            ArrayList<User> users = ((ArrayList<User>)new UserRepository(unitOfWork).getUserByName(requestingUser));
+            if (users.isEmpty()) {
+                return new Response(
+                        HttpStatus.FORBIDDEN,
+                        ContentType.JSON,
+                        "{ \"message\" : \"Token Not Accepted\" }"
+                );
+            }
+
+            // User Data of requesting user
+            User user = users.get(0);
+
+            ArrayList<Trade> trades = (ArrayList<Trade>) new TradeRepository(unitOfWork).getTradeById(tradeId);
+
+            if (trades.isEmpty()) {
+                return new Response(
+                        HttpStatus.NOT_FOUND,
+                        ContentType.JSON,
+                        "{ \"message\" : \"The provided deal ID was not found.\" }"
+                );
+            }
+
+            Trade trade = trades.get(0);
+
+            if (trade.getInitiatorId() != user.getUserId()) {
+                return new Response(
+                        HttpStatus.FORBIDDEN,
+                        ContentType.JSON,
+                        "{ \"message\" : \"Can only delete own trades.\" }"
+                );
+            }
+
+            new TradeRepository(unitOfWork).deleteTradeById(trade.getTradeId());
+
+            unitOfWork.commitTransaction();
+
+            return new Response(
+                    HttpStatus.OK,
+                    ContentType.JSON,
+                    "{ \"message\" : \"Trading deal successfully deleted.\" }"
             );
 
         } catch (Exception e) {

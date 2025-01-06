@@ -38,12 +38,18 @@ public class TradeService implements Service {
                         "{ \"message\" : \"Access token is missing or invalid\" }"
                 );
             }
-            return tradeController.createNewTrade(request);
+            return this.tradeController.createNewTrade(request);
         }
         // DELETE with Argument
         if (request.getMethod() == Method.DELETE && request.getPathParts().size() > 1) {
-            // TODO: Implement this method
-            return null;
+            if (request.getHeaderMap().getHeader("Authorization") == null) {
+                return new Response(
+                        HttpStatus.UNAUTHORIZED,
+                        ContentType.JSON,
+                        "{ \"message\" : \"Access token is missing or invalid\" }"
+                );
+            }
+            return this.tradeController.deleteTrade(request);
         }
         // POST with Argument
         if (request.getMethod() == Method.POST && request.getPathParts().size() > 1) {
