@@ -172,4 +172,19 @@ public class CardRepository {
             throw new DataAccessException("Update not successful", e);
         }
     }
+
+    public void updateOwner(String cardId, int uid) {
+        try (PreparedStatement preparedStatement = this.unitOfWork.prepareStatement(
+                """
+                        UPDATE "card" SET fk_pk_user_id = ? WHERE pk_card_id = ?;
+                        """)) {
+            preparedStatement.setInt(1, uid);
+            preparedStatement.setString(2, cardId);
+
+            preparedStatement.execute();
+
+        } catch (SQLException e) {
+            throw new DataAccessException("Update not successful", e);
+        }
+    }
 }
