@@ -36,9 +36,7 @@ public class Main {
         router.addService("/stats", new StatService());
         router.addService("/scoreboard", new ScoreboardService());
         router.addService("/battles", new BattleService());
-        // Not yet fully implemented
         router.addService("/tradings", new TradeService());
-
 
         return router;
     }
