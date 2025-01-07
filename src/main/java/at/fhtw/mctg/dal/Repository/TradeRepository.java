@@ -225,4 +225,56 @@ public class TradeRepository {
             throw new DataAccessException("Failed to delete trade with ID: " + tradeId, e);
         }
     }
+
+    public Trade updateTrade(Trade trade) {
+        try (PreparedStatement preparedStatement = this.unitOfWork.prepareStatement(
+                """
+                UPDATE "trade"
+                SET 
+                    fk_pk_tradepartner_id = ?,
+                    fk_pk_receivercard_id = ?,
+                    status = ?::tradestatus,
+                    time_completed = ? 
+                WHERE pk_trade_id = ?
+                RETURNING 
+                    pk_trade_id,
+                    fk_pk_initiator_id,
+                    fk_pk_tradepartner_id,
+                    fk_pk_sendercard_id,
+                    fk_pk_receivercard_id,
+                    status,
+                    time_start,
+                    time_completed,
+                    requested_type,
+                    requested_damage
+                """
+        )) {
+            preparedStatement.setInt(1, trade.getPartnerId());
+            preparedStatement.setString(2, trade.getReceiverCardId());
+            preparedStatement.setString(3, trade.getStatus().name());
+            preparedStatement.setTimestamp(4, trade.getTimeCompleted());
+            preparedStatement.setString(5, trade.getTradeId());
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                return new Trade(
+                        resultSet.getString("pk_trade_id"),
+                        resultSet.getInt("fk_pk_initiator_id"),
+                        resultSet.getInt("fk_pk_tradepartner_id"),
+                        resultSet.getString("fk_pk_sendercard_id"),
+                        resultSet.getString("fk_pk_receivercard_id"),
+                        TradeStatus.valueOf(resultSet.getString("status")),
+                        resultSet.getTimestamp("time_start"),
+                        resultSet.getTimestamp("time_completed"),
+                        CardType.valueOf(resultSet.getString("requested_type")),
+                        resultSet.getInt("requested_damage")
+                );
+            } else {
+                throw new DataAccessException("Trade with ID " + trade.getTradeId() + " not found for update.");
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Failed to update trade with ID: " + trade.getTradeId(), e);
+        }
+    }
 }
