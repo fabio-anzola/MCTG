@@ -17,6 +17,7 @@ public class Trade {
     private int initiatorId;
 
     @JsonAlias({"partnerId"})
+    @Setter
     private int partnerId;
 
     @JsonAlias({"CardToTrade"})
@@ -24,6 +25,7 @@ public class Trade {
     private String senderCardId;
 
     @JsonAlias({"receiverCardId"})
+    @Setter
     private String receiverCardId;
 
     @JsonAlias({"status"})
@@ -34,6 +36,7 @@ public class Trade {
     private Timestamp timeCreated;
 
     @JsonAlias({"timeCompleted"})
+    @Setter
     private Timestamp timeCompleted;
 
     @JsonAlias({"Type"})
