@@ -29,6 +29,17 @@ public class TradeService implements Service {
             }
             return tradeController.getAvailableTrades(request);
         }
+        // POST with Argument
+        if (request.getMethod() == Method.POST && request.getPathParts().size() > 1) {
+            if (request.getHeaderMap().getHeader("Authorization") == null) {
+                return new Response(
+                        HttpStatus.UNAUTHORIZED,
+                        ContentType.JSON,
+                        "{ \"message\" : \"Access token is missing or invalid\" }"
+                );
+            }
+            return this.tradeController.joinTrade(request);
+        }
         // POST
         if (request.getMethod() == Method.POST) {
             if (request.getHeaderMap().getHeader("Authorization") == null) {
@@ -50,11 +61,6 @@ public class TradeService implements Service {
                 );
             }
             return this.tradeController.deleteTrade(request);
-        }
-        // POST with Argument
-        if (request.getMethod() == Method.POST && request.getPathParts().size() > 1) {
-            // TODO: Implement this method
-            return null;
         }
 
         return new Response(
