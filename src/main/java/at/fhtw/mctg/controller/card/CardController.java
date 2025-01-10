@@ -13,19 +13,29 @@ import at.fhtw.mctg.model.Card;
 import at.fhtw.mctg.model.CardType;
 import at.fhtw.mctg.model.Elements;
 import at.fhtw.mctg.model.User;
-import at.fhtw.mctg.utils.PasswordHash;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
+/**
+ * App controller for Card Routes
+ */
 public class CardController extends Controller {
+
+    /**
+     * Method to add multiple cards to a pack
+     *
+     * @param request
+     * @param packId
+     * @return
+     */
     public Response addMultipleCards(Request request, int packId) {
         UnitOfWork unitOfWork = new UnitOfWork();
 
         try (unitOfWork) {
             Card[] requestedCards = this.getObjectMapper().readValue(request.getBody(), Card[].class);
 
+            // Check if ids are unique
             for (Card requestedCard : requestedCards) {
                 if (!new CardRepository(unitOfWork).getCardById(requestedCard.getCardId()).isEmpty()) {
                     unitOfWork.rollbackTransaction();
@@ -37,27 +47,28 @@ public class CardController extends Controller {
                 }
             }
 
+            // Generate objects
             for (Card requestedCard : requestedCards) {
+                // set pack id
                 requestedCard.setPackageId(packId);
+
+                // check if card is spell or monster
                 if (requestedCard.getName().contains("Spell")) {
                     requestedCard.setType(CardType.SPELL);
-                }
-                else {
+                } else {
                     requestedCard.setType(CardType.MONSTER);
                 }
 
+                // check element of card
                 if (requestedCard.getName().contains("Water")) {
                     requestedCard.setElement(Elements.WATER);
-                }
-                else if (requestedCard.getName().contains("Fire")) {
+                } else if (requestedCard.getName().contains("Fire")) {
                     requestedCard.setElement(Elements.FIRE);
-                }
-                else {
+                } else {
                     requestedCard.setElement(Elements.NORMAL);
                 }
 
-                // requestedCard.setType();
-                // requestedCard.setElement();
+                // save object to db
                 new CardRepository(unitOfWork).createCard(requestedCard);
             }
 
@@ -81,13 +92,20 @@ public class CardController extends Controller {
         }
     }
 
+    /**
+     * Method to get cards based on the associated user id
+     *
+     * @param request request by user
+     * @return the Response with the cards
+     */
     public Response getCardsByUid(Request request) {
         UnitOfWork unitOfWork = new UnitOfWork();
 
         try (unitOfWork) {
             String requestingUser = new SessionController().getUserByToken(request);
 
-            ArrayList<User> users = ((ArrayList<User>)new UserRepository(unitOfWork).getUserByName(requestingUser));
+            // Check if requesting user exists
+            ArrayList<User> users = ((ArrayList<User>) new UserRepository(unitOfWork).getUserByName(requestingUser));
             if (users.isEmpty()) {
                 return new Response(
                         HttpStatus.FORBIDDEN,
@@ -96,10 +114,13 @@ public class CardController extends Controller {
                 );
             }
 
-            User user = ((ArrayList<User>)new UserRepository(unitOfWork).getUserByName(requestingUser)).get(0);
+            // Get object of requesting user
+            User user = users.get(0);
 
-            ArrayList<Card> cards = (ArrayList<Card>)new CardRepository(unitOfWork).getCardsByUserId(user.getUserId());
+            // Get cards by user id
+            ArrayList<Card> cards = (ArrayList<Card>) new CardRepository(unitOfWork).getCardsByUserId(user.getUserId());
 
+            // Check if there are more then 0 cards
             if (cards.isEmpty()) {
                 return new Response(
                         HttpStatus.NO_CONTENT,

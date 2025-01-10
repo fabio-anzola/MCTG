@@ -14,14 +14,25 @@ import at.fhtw.mctg.utils.PasswordHash;
 import java.util.ArrayList;
 import java.util.Collection;
 
+/**
+ * App controller for Transaction Routes
+ */
 public class UserController extends Controller {
 
+    /**
+     * Method to create a user
+     *
+     * @param request request containing user info
+     * @return response with status message
+     */
     public Response createUser(Request request) {
         UnitOfWork unitOfWork = new UnitOfWork();
 
         try (unitOfWork) {
+            // User info
             User requestedUser = this.getObjectMapper().readValue(request.getBody(), User.class);
 
+            // check if user exists by username
             if (!new UserRepository(unitOfWork).getUserByName(requestedUser.getUsername()).isEmpty()) {
                 return new Response(
                         HttpStatus.CONFLICT,
@@ -30,7 +41,10 @@ public class UserController extends Controller {
                 );
             }
 
+            // set encrypted password
             requestedUser.setPassword(PasswordHash.generateHashedPassword(requestedUser.getPassword()));
+
+            // store user
             new UserRepository(unitOfWork).createUser(requestedUser);
 
             unitOfWork.commitTransaction();
@@ -53,12 +67,20 @@ public class UserController extends Controller {
         }
     }
 
+    /**
+     * Method to get user by username
+     *
+     * @param request request by user
+     * @return the user data
+     */
     public Response getUserByName(Request request) {
         String username = request.getPathParts().get(1); //the user we want to see
 
         UnitOfWork unitOfWork = new UnitOfWork();
 
         try (unitOfWork) {
+
+            // get requesting user data
             String requestingUser = new SessionController().getUserByToken(request);
             ArrayList<User> tokenUsers = ((ArrayList<User>) new UserRepository(unitOfWork).getUserByName(requestingUser));
             if (tokenUsers.isEmpty()) {
@@ -69,7 +91,7 @@ public class UserController extends Controller {
                 );
             }
 
-
+            // get requested user
             Collection<User> dbUsers = new UserRepository(unitOfWork).getUserByName(requestingUser);
             if (dbUsers.isEmpty()) {
                 unitOfWork.rollbackTransaction();
@@ -80,7 +102,9 @@ public class UserController extends Controller {
                 );
             }
 
-            User user = ((ArrayList<User>)dbUsers).get(0);
+            User user = ((ArrayList<User>) dbUsers).get(0);
+
+            // only allow to get own user
             if (!user.getUsername().equals(username)) {
                 return new Response(
                         HttpStatus.FORBIDDEN,
@@ -89,10 +113,9 @@ public class UserController extends Controller {
                 );
             }
 
-            User reqUser = ((ArrayList<User>)new UserRepository(unitOfWork).getUserByName(username)).get(0);
+            User reqUser = ((ArrayList<User>) new UserRepository(unitOfWork).getUserByName(username)).get(0);
 
             String UserDataJSON = this.getObjectMapper().writeValueAsString(reqUser);
-
             unitOfWork.commitTransaction();
 
             return new Response(
@@ -113,12 +136,19 @@ public class UserController extends Controller {
         }
     }
 
+    /**
+     * Method to update user by username for bio, name, image, password
+     *
+     * @param request requests by user containing user data
+     * @return the status message
+     */
     public Response updateUserByName(Request request) {
         String username = request.getPathParts().get(1);
 
         UnitOfWork unitOfWork = new UnitOfWork();
 
         try (unitOfWork) {
+            // get token user data
             String requestingUser = new SessionController().getUserByToken(request);
             ArrayList<User> tokenUsers = ((ArrayList<User>) new UserRepository(unitOfWork).getUserByName(requestingUser));
             if (tokenUsers.isEmpty()) {
@@ -129,7 +159,7 @@ public class UserController extends Controller {
                 );
             }
 
-
+            // get user
             Collection<User> dbUsers = new UserRepository(unitOfWork).getUserByName(requestingUser);
             if (dbUsers.isEmpty()) {
                 unitOfWork.rollbackTransaction();
@@ -140,8 +170,9 @@ public class UserController extends Controller {
                 );
             }
 
-            User user = ((ArrayList<User>)dbUsers).get(0);
+            User user = ((ArrayList<User>) dbUsers).get(0);
 
+            // only allow own user
             if (!user.getUsername().equals(username)) {
                 return new Response(
                         HttpStatus.FORBIDDEN,
@@ -149,7 +180,6 @@ public class UserController extends Controller {
                         "{ \"message\" : \"Cannot update other user\" }"
                 );
             }
-
 
             User extractedUser = this.getObjectMapper().readValue(request.getBody(), User.class);
 

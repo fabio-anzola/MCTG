@@ -6,27 +6,44 @@ import at.fhtw.httpserver.server.Request;
 import at.fhtw.httpserver.server.Response;
 import at.fhtw.mctg.controller.Controller;
 import at.fhtw.mctg.controller.session.SessionController;
-import at.fhtw.mctg.controller.users.UserController;
 import at.fhtw.mctg.dal.Repository.CardRepository;
 import at.fhtw.mctg.dal.Repository.PackageRepository;
 import at.fhtw.mctg.dal.Repository.UserRepository;
 import at.fhtw.mctg.dal.UnitOfWork;
 import at.fhtw.mctg.model.CardPack;
 import at.fhtw.mctg.model.User;
-import at.fhtw.mctg.service.transaction.TransactionService;
-import at.fhtw.mctg.utils.PasswordHash;
-import org.postgresql.shaded.com.ongres.scram.common.bouncycastle.pbkdf2.Pack;
 
 import java.util.ArrayList;
 
+/**
+ * App controller for Transaction Routes
+ */
 public class TransactionController extends Controller {
+
+    /**
+     * Method to acquire a pack
+     *
+     * @param request request by the user
+     * @return the json status message
+     */
     public Response acquirePack(Request request) {
         UnitOfWork unitOfWork = new UnitOfWork();
 
         try (unitOfWork) {
             String requestingUser = new SessionController().getUserByToken(request);
-            User user = ((ArrayList<User>)new UserRepository(unitOfWork).getUserByName(requestingUser)).get(0);
 
+            // get the user
+            ArrayList<User> users = ((ArrayList<User>) new UserRepository(unitOfWork).getUserByName(requestingUser));
+            if (users.isEmpty()) {
+                return new Response(
+                        HttpStatus.FORBIDDEN,
+                        ContentType.JSON,
+                        "{ \"message\" : \"Token Not Accepted\" }"
+                );
+            }
+            User user = users.get(0);
+
+            // get pack obj to acquire
             CardPack pack = new PackageRepository(unitOfWork).getFreePack();
 
             if (pack == null) {

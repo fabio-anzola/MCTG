@@ -14,14 +14,24 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
 
+/**
+ * App controller for Scoreboard Routes
+ */
 public class ScoreboardController extends Controller {
+
+    /**
+     * Method to get the scoreboard
+     *
+     * @param request the users request
+     * @return the response containing the scoreboard
+     */
     public Response getScoreboard(Request request) {
         UnitOfWork unitOfWork = new UnitOfWork();
 
         try (unitOfWork) {
+            // get user data
             String requestingUser = new SessionController().getUserByToken(request);
-
-            ArrayList<User> users = ((ArrayList<User>)new UserRepository(unitOfWork).getUserByName(requestingUser));
+            ArrayList<User> users = ((ArrayList<User>) new UserRepository(unitOfWork).getUserByName(requestingUser));
             if (users.isEmpty()) {
                 return new Response(
                         HttpStatus.FORBIDDEN,
@@ -29,10 +39,10 @@ public class ScoreboardController extends Controller {
                         "{ \"message\" : \"Token Not Accepted\" }"
                 );
             }
-
             User user = users.get(0);
 
-            ArrayList<Stats> scoreboard = ((ArrayList<Stats>)new UserRepository(unitOfWork).getOrderedStats());
+            // get scoreboard
+            ArrayList<Stats> scoreboard = ((ArrayList<Stats>) new UserRepository(unitOfWork).getOrderedStats());
 
             unitOfWork.commitTransaction();
 

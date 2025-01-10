@@ -1,21 +1,21 @@
 package at.fhtw.mctg.controller.pack;
 
-import at.fhtw.httpserver.http.ContentType;
-import at.fhtw.httpserver.http.HttpStatus;
 import at.fhtw.httpserver.server.Request;
-import at.fhtw.httpserver.server.Response;
 import at.fhtw.mctg.controller.Controller;
 import at.fhtw.mctg.dal.Repository.PackageRepository;
-import at.fhtw.mctg.dal.Repository.UserRepository;
 import at.fhtw.mctg.dal.UnitOfWork;
-import at.fhtw.mctg.model.CardPack;
-import at.fhtw.mctg.model.User;
-import at.fhtw.mctg.utils.PasswordHash;
 
-import java.util.Arrays;
-
+/**
+ * App controller for Pack Routes
+ */
 public class PackController extends Controller {
 
+    /**
+     * Method to create a pack
+     *
+     * @param request request from user
+     * @return the pack id
+     */
     public int createPack(Request request) {
         UnitOfWork unitOfWork = new UnitOfWork();
 

@@ -11,21 +11,30 @@ import at.fhtw.mctg.dal.Repository.TradeRepository;
 import at.fhtw.mctg.dal.Repository.UserRepository;
 import at.fhtw.mctg.dal.UnitOfWork;
 import at.fhtw.mctg.model.*;
-import at.fhtw.mctg.service.trade.TradeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Collection;
 
+/**
+ * App controller for Trade Routes
+ */
 public class TradeController extends Controller {
+
+    /**
+     * Method to get trade in pending state
+     *
+     * @param request the request by the user
+     * @return response with trades
+     */
     public Response getAvailableTrades(Request request) {
         UnitOfWork unitOfWork = new UnitOfWork();
 
         try (unitOfWork) {
             String requestingUser = new SessionController().getUserByToken(request);
 
-            ArrayList<User> users = ((ArrayList<User>)new UserRepository(unitOfWork).getUserByName(requestingUser));
+            // get the user
+            ArrayList<User> users = ((ArrayList<User>) new UserRepository(unitOfWork).getUserByName(requestingUser));
             if (users.isEmpty()) {
                 return new Response(
                         HttpStatus.FORBIDDEN,
@@ -33,10 +42,9 @@ public class TradeController extends Controller {
                         "{ \"message\" : \"Token Not Accepted\" }"
                 );
             }
-
-            // User Data of requesting user
             User user = users.get(0);
 
+            // get open trades
             ArrayList<Trade> trades = (ArrayList<Trade>) new TradeRepository(unitOfWork).getPendingTrades();
 
             unitOfWork.commitTransaction();
@@ -69,6 +77,12 @@ public class TradeController extends Controller {
         }
     }
 
+    /**
+     * Method to create a new trade
+     *
+     * @param request request containing the trade info
+     * @return the created trade as response
+     */
     public Response createNewTrade(Request request) {
         // check if user is valid
         // check if card belongs to user
@@ -79,7 +93,8 @@ public class TradeController extends Controller {
         try (unitOfWork) {
             String requestingUser = new SessionController().getUserByToken(request);
 
-            ArrayList<User> users = ((ArrayList<User>)new UserRepository(unitOfWork).getUserByName(requestingUser));
+            // Get user
+            ArrayList<User> users = ((ArrayList<User>) new UserRepository(unitOfWork).getUserByName(requestingUser));
             if (users.isEmpty()) {
                 return new Response(
                         HttpStatus.FORBIDDEN,
@@ -87,10 +102,9 @@ public class TradeController extends Controller {
                         "{ \"message\" : \"Token Not Accepted\" }"
                 );
             }
-
-            // User Data of requesting user
             User user = users.get(0);
 
+            // get trade info as object
             Trade reqTrade = this.getObjectMapper().readValue(request.getBody(), Trade.class);
 
             // Check if card exists
@@ -167,6 +181,12 @@ public class TradeController extends Controller {
         }
     }
 
+    /**
+     * Method to delete a trade
+     *
+     * @param request request by user
+     * @return the message
+     */
     public Response deleteTrade(Request request) {
         String tradeId = request.getPathParts().get(1); //the trade we want to delete
 
@@ -175,7 +195,8 @@ public class TradeController extends Controller {
         try (unitOfWork) {
             String requestingUser = new SessionController().getUserByToken(request);
 
-            ArrayList<User> users = ((ArrayList<User>)new UserRepository(unitOfWork).getUserByName(requestingUser));
+            // get the user
+            ArrayList<User> users = ((ArrayList<User>) new UserRepository(unitOfWork).getUserByName(requestingUser));
             if (users.isEmpty()) {
                 return new Response(
                         HttpStatus.FORBIDDEN,
@@ -183,12 +204,12 @@ public class TradeController extends Controller {
                         "{ \"message\" : \"Token Not Accepted\" }"
                 );
             }
-
-            // User Data of requesting user
             User user = users.get(0);
 
+            // get the trade by id
             ArrayList<Trade> trades = (ArrayList<Trade>) new TradeRepository(unitOfWork).getTradeById(tradeId);
 
+            // check if trade exists
             if (trades.isEmpty()) {
                 return new Response(
                         HttpStatus.NOT_FOUND,
@@ -197,8 +218,10 @@ public class TradeController extends Controller {
                 );
             }
 
+            // get trade
             Trade trade = trades.get(0);
 
+            // check if is own trade
             if (trade.getInitiatorId() != user.getUserId()) {
                 return new Response(
                         HttpStatus.FORBIDDEN,
@@ -207,6 +230,7 @@ public class TradeController extends Controller {
                 );
             }
 
+            // delete trade
             new TradeRepository(unitOfWork).deleteTradeById(trade.getTradeId());
 
             unitOfWork.commitTransaction();
@@ -229,6 +253,12 @@ public class TradeController extends Controller {
         }
     }
 
+    /**
+     * Method to join trade
+     *
+     * @param request request by user
+     * @return a status message
+     */
     public Response joinTrade(Request request) {
         // check if user is valid
         // check if trade exists
@@ -242,7 +272,8 @@ public class TradeController extends Controller {
         try (unitOfWork) {
             String requestingUser = new SessionController().getUserByToken(request);
 
-            ArrayList<User> users = ((ArrayList<User>)new UserRepository(unitOfWork).getUserByName(requestingUser));
+            // get user
+            ArrayList<User> users = ((ArrayList<User>) new UserRepository(unitOfWork).getUserByName(requestingUser));
             if (users.isEmpty()) {
                 return new Response(
                         HttpStatus.FORBIDDEN,
@@ -250,8 +281,6 @@ public class TradeController extends Controller {
                         "{ \"message\" : \"Token Not Accepted\" }"
                 );
             }
-
-            // User Data of requesting user
             User user = users.get(0);
 
             // Check if card exists
@@ -342,7 +371,6 @@ public class TradeController extends Controller {
             trade.setPartnerId(user.getUserId());
             trade.setReceiverCardId(card.getCardId());
             trade.setTimeCompleted(new Timestamp(System.currentTimeMillis()));
-
             new TradeRepository(unitOfWork).updateTrade(trade);
 
             // remove cards vice versa

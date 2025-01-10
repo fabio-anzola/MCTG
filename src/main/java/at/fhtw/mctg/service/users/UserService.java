@@ -8,13 +8,31 @@ import at.fhtw.httpserver.server.Response;
 import at.fhtw.httpserver.server.Service;
 import at.fhtw.mctg.controller.users.UserController;
 
+/**
+ * The UserService class implements the Service interface and serves as the entry point for handling user-related HTTP requests.
+ * It delegates the processing of requests to the UserController class. The service provides functionality for creating new users,
+ * retrieving user information by username, and updating user details.
+ */
 public class UserService implements Service {
     private final UserController userController;
 
+    /**
+     * Constructs a new instance of the UserService class.
+     * This service is responsible for handling user-related HTTP requests by delegating
+     * operations to the UserController. It provides functionality to create, retrieve,
+     * and update user information.
+     */
     public UserService() {
         this.userController = new UserController();
     }
 
+    /**
+     * Handles an incoming HTTP request and delegates processing to the appropriate
+     * user-related controller methods based on the HTTP method and URL structure.
+     *
+     * @param request the incoming HTTP request containing method, path, and relevant data
+     * @return a Response object that encapsulates the status, content type, and response body
+     */
     @Override
     public Response handleRequest(Request request) {
 

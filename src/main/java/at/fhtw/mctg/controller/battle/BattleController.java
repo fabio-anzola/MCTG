@@ -7,26 +7,33 @@ import at.fhtw.httpserver.server.Response;
 import at.fhtw.mctg.controller.Controller;
 import at.fhtw.mctg.controller.session.SessionController;
 import at.fhtw.mctg.dal.Repository.BattleRepository;
-import at.fhtw.mctg.dal.Repository.UserRepository;
 import at.fhtw.mctg.dal.UnitOfWork;
-import at.fhtw.mctg.model.*;
+import at.fhtw.mctg.model.Battle;
+import at.fhtw.mctg.model.BattleLog;
 import at.fhtw.mctg.threads.BattleRunner;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 import static java.lang.Thread.sleep;
 
+/**
+ * App controller for Battle Routes
+ */
 public class BattleController extends Controller {
 
+    /**
+     * Method to initialize a battle on request
+     *
+     * @param request req by user
+     * @return the battle
+     */
     public Battle initBattle(Request request) {
         UnitOfWork unitOfWork = new UnitOfWork();
 
         try (unitOfWork) {
             String requestingUser = new SessionController().getUserByToken(request);
 
-            ArrayList<Battle> availableBattles = (ArrayList<Battle>)new BattleRepository(unitOfWork).getPendingBattles();
+            ArrayList<Battle> availableBattles = (ArrayList<Battle>) new BattleRepository(unitOfWork).getPendingBattles();
 
             Battle battle;
 
@@ -65,6 +72,11 @@ public class BattleController extends Controller {
     }
 
 
+    /**
+     * Method to wait until battle completes
+     *
+     * @param battle the battle to check
+     */
     public void waitForBattle(Battle battle) {
         UnitOfWork unitOfWork = new UnitOfWork();
 
@@ -82,6 +94,11 @@ public class BattleController extends Controller {
         }
     }
 
+    /**
+     * Method to get the log of a Battle
+     * @param battle the battle to get the log from
+     * @return the Response for the user
+     */
     public Response getLog(Battle battle) {
         UnitOfWork unitOfWork = new UnitOfWork();
 

@@ -14,15 +14,25 @@ import at.fhtw.mctg.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
+/**
+ * App controller for Deck Routes
+ */
 public class DeckController extends Controller {
+
+    /**
+     * Method to get active cards by user id
+     *
+     * @param request the request by the user
+     * @return response containing the active cards
+     */
     public Response getActiveCards(Request request) {
         UnitOfWork unitOfWork = new UnitOfWork();
 
         try (unitOfWork) {
             String requestingUser = new SessionController().getUserByToken(request);
 
+            // check if requesting user exists
             ArrayList<User> users = ((ArrayList<User>) new UserRepository(unitOfWork).getUserByName(requestingUser));
             if (users.isEmpty()) {
                 return new Response(
@@ -32,10 +42,13 @@ public class DeckController extends Controller {
                 );
             }
 
-            User user = ((ArrayList<User>) new UserRepository(unitOfWork).getUserByName(requestingUser)).get(0);
+            // get user object
+            User user = users.get(0);
 
+            // get active cards
             ArrayList<Card> cards = (ArrayList<Card>) new CardRepository(unitOfWork).getActiveCardsByUserId(user.getUserId());
 
+            // check if there are more that 0 cards
             if (cards.isEmpty()) {
                 return new Response(
                         HttpStatus.NO_CONTENT,
@@ -81,6 +94,12 @@ public class DeckController extends Controller {
         }
     }
 
+    /**
+     * Method to set an array of cards as active for a user
+     *
+     * @param request the users Request containing an array of cards
+     * @return Confirmation message
+     */
     public Response setActiveCards(Request request) {
         UnitOfWork unitOfWork = new UnitOfWork();
 
@@ -96,7 +115,7 @@ public class DeckController extends Controller {
                         "{ \"message\" : \"Token Not Accepted\" }"
                 );
             }
-            User user = ((ArrayList<User>) new UserRepository(unitOfWork).getUserByName(requestingUser)).get(0);
+            User user = users.get(0);
 
             // Get Ids from request body
             String[] cardIdArray = new ObjectMapper().readValue(request.getBody(), String[].class);
