@@ -1,12 +1,18 @@
 package at.fhtw.mctg.model;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
-import com.fasterxml.jackson.annotation.JsonSetter;
-import com.fasterxml.jackson.annotation.Nulls;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+/**
+ * Represents a User entity with attributes such as user ID, username, password, name, bio, image, wallet, and Elo score.
+ * This class is primarily used for managing user-related data and interactions within the system.
+ *
+ * Fields annotated with @JsonAlias allow for JSON field mapping during serialization and deserialization.
+ * Lombok annotations @Getter and @ToString are applied to generate boilerplate code for getter methods and string representation functionality.
+ * Individual attributes such as password, name, bio, image, wallet, and Elo score have setter methods for updating their values.
+ */
 @Getter
 @ToString
 public class User {

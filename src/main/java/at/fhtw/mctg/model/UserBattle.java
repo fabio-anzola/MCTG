@@ -3,6 +3,17 @@ package at.fhtw.mctg.model;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Getter;
 
+/**
+ * Represents the relationship between a user and a battle.
+ * This class captures the user participating in a battle, the associated battle,
+ * and the user's status in the battle (e.g., win, loss, tie, or pending).
+ *
+ * Instances of this class can be created either with default values or with specific
+ * details such as user ID, battle ID, and battle status.
+ *
+ * This entity is often used in operations like querying the participants of a battle
+ * and determining the current state or outcome of a battle for each user.
+ */
 public class UserBattle {
     @JsonAlias({"userId"})
     @Getter

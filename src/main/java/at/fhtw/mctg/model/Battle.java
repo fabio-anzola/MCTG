@@ -2,10 +2,18 @@ package at.fhtw.mctg.model;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.sql.Timestamp;
 
+/**
+ * The Battle class represents a battle entity in the system.
+ * It contains information about the battle's unique identifier,
+ * start and end times, the number of rounds, and the associated log ID.
+ *
+ * This class provides constructors to create a battle instance
+ * and is designed to be compatible with JSON serialization/deserialization
+ * using the @JsonAlias annotations.
+ */
 public class Battle {
     @JsonAlias({"Id"})
     @Getter

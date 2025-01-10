@@ -6,6 +6,12 @@ import lombok.Setter;
 
 import java.sql.Timestamp;
 
+/**
+ * Represents a trade in the system, allowing the exchange of cards between users.
+ * A trade involves an initiator offering a card to a partner in exchange for a
+ * requested card type with specific criteria. Trades have specific statuses and
+ * include timestamps to track their creation and completion.
+ */
 @Getter
 public class Trade {
 
@@ -58,6 +64,9 @@ public class Trade {
         this.requestedDamage = requestedDamage;
     }
 
+    /**
+     * Default Constructor needed by Lombok
+     */
     public Trade() {
     }
 }

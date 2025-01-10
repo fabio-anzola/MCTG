@@ -3,6 +3,12 @@ package at.fhtw.mctg.model;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Getter;
 
+/**
+ * The BattleLog class represents a single entry in the log of a battle.
+ * It contains information about the battle ID, the row number of the log entry,
+ * and the textual content of the log entry.
+ * This class is used to track individual log entries for a specific battle.
+ */
 public class BattleLog {
     @JsonAlias({"Id"})
     private int battleId;

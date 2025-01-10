@@ -4,6 +4,12 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Represents a card which can be used in a game.
+ * The card contains attributes such as unique identifier,
+ * name, damage points, card type, element type, active state,
+ * user ownership, and associated package details.
+ */
 @Getter
 public class Card {
 
@@ -57,6 +63,9 @@ public class Card {
         this.packageId = packageId;
     }
 
+    /**
+     * Default Constructor needed by Lombok
+     */
     public Card() {
     }
 }

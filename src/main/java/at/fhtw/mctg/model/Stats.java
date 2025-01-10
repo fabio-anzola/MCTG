@@ -3,6 +3,13 @@ package at.fhtw.mctg.model;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Getter;
 
+/**
+ * Represents a user's statistical data including their username, name, elo ranking,
+ * number of wins, losses, and ties.
+ *
+ * This class is designed to be used to encapsulate data retrieved from a database
+ * or other source of user statistics.
+ */
 @Getter
 public class Stats {
     @JsonAlias({"Username"})
