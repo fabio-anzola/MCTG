@@ -11,15 +11,28 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import static java.lang.Thread.sleep;
-
+/**
+ * Repository class for managing User entities.
+ * Provides methods to interact with the user-related data in the database.
+ */
 public class UserRepository {
-    private UnitOfWork unitOfWork;
+    private final UnitOfWork unitOfWork;
 
+    /**
+     * Constructs a new UserRepository with the given UnitOfWork instance.
+     *
+     * @param unitOfWork the UnitOfWork instance used to manage database transactions
+     */
     public UserRepository(UnitOfWork unitOfWork) {
         this.unitOfWork = unitOfWork;
     }
 
+    /**
+     * Creates a new user record in the database.
+     *
+     * @param user the User object containing the username and password to be added to the database
+     * @throws DataAccessException if a database access error occurs or the insert operation fails
+     */
     public void createUser(User user) {
         try (PreparedStatement preparedStatement = this.unitOfWork.prepareStatement(
                 """
@@ -35,6 +48,13 @@ public class UserRepository {
         }
     }
 
+    /**
+     * Retrieves a collection of users from the database based on their username.
+     *
+     * @param name the username to search for
+     * @return a collection containing {@code User} objects matching the given username
+     * @throws DataAccessException if a database access error occurs or the query fails
+     */
     public Collection<User> getUserByName(String name) {
         try (PreparedStatement preparedStatement = this.unitOfWork.prepareStatement(
                 """
@@ -68,6 +88,13 @@ public class UserRepository {
         }
     }
 
+    /**
+     * Retrieves a user from the database by their unique identifier.
+     *
+     * @param userId the unique ID of the user to retrieve
+     * @return a {@code User} object if a user with the specified ID exists, or {@code null} if no such user is found
+     * @throws DataAccessException if a database access error occurs during the operation
+     */
     public User getUserById(int userId) {
         try (PreparedStatement preparedStatement = this.unitOfWork.prepareStatement(
                 """
@@ -97,6 +124,13 @@ public class UserRepository {
         }
     }
 
+    /**
+     * Updates a user's details in the database based on the provided username.
+     *
+     * @param username the username of the user whose details are to be updated
+     * @param user     the User object containing updated details such as bio, name, image, password, and elo
+     * @throws DataAccessException if a database access error occurs or the update operation fails
+     */
     public void updateUserByName(String username, User user) {
         try (PreparedStatement preparedStatement = this.unitOfWork.prepareStatement(
                 """
@@ -116,8 +150,17 @@ public class UserRepository {
         }
     }
 
+    /**
+     * Updates the wallet balance of a user based on the username and the specified change.
+     * This method retrieves the current wallet balance of the user,
+     * adjusts it by the specified change amount, and updates it in the database.
+     *
+     * @param username the username of the user whose wallet will be updated
+     * @param change   the amount by which the user's wallet balance will be adjusted; can be positive or negative
+     * @throws DataAccessException if a database access error occurs or the update operation fails
+     */
     public void updateWalletByName(String username, int change) {
-        int current = ((ArrayList<User>)getUserByName(username)).get(0).getWallet();
+        int current = ((ArrayList<User>) getUserByName(username)).get(0).getWallet();
         try (PreparedStatement preparedStatement = this.unitOfWork.prepareStatement(
                 """
                         UPDATE "user" SET wallet = ? WHERE username = ?
@@ -132,6 +175,13 @@ public class UserRepository {
         }
     }
 
+    /**
+     * Retrieves the statistics for a user identified by their username.
+     *
+     * @param username the username of the user whose stats are to be retrieved
+     * @return a {@code Stats} object containing the user's statistics, including username, name, elo, wins, losses, and ties
+     * @throws DataAccessException if a database access error occurs or the query fails
+     */
     public Stats getUserStatsByName(String username) {
         try (PreparedStatement preparedStatement = this.unitOfWork.prepareStatement(
                 """
@@ -168,6 +218,14 @@ public class UserRepository {
         }
     }
 
+    /**
+     * Retrieves a collection of user statistics ordered by Elo score in descending order.
+     * The statistics include username, name, Elo score, total wins, total losses, and total ties.
+     * The method queries the database, processes the results, and generates a collection of {@code Stats} objects.
+     *
+     * @return a {@code Collection} of {@code Stats} objects representing user statistics sorted by Elo score in descending order
+     * @throws DataAccessException if a database access error occurs or the query fails
+     */
     public Collection<Stats> getOrderedStats() {
         try (PreparedStatement preparedStatement = this.unitOfWork.prepareStatement(
                 """
@@ -207,30 +265,4 @@ public class UserRepository {
             throw new DataAccessException("Select not successful", e);
         }
     }
-
-//    public Collection<Weather> findAllWeather() {
-//        try (PreparedStatement preparedStatement =
-//                     this.unitOfWork.prepareStatement("""
-//                    select * from weather
-//                    where region = ?
-//                """))
-//        {
-//            preparedStatement.setString(1, "Europe");
-//            ResultSet resultSet = preparedStatement.executeQuery();
-//            Collection<User> weatherRows = new ArrayList<>();
-//            while(resultSet.next())
-//            {
-//                Weather weather = new Weather(
-//                        resultSet.getInt(1),
-//                        resultSet.getString(2),
-//                        resultSet.getString(3),
-//                        resultSet.getInt(4));
-//                weatherRows.add(weather);
-//            }
-//
-//            return weatherRows;
-//        } catch (SQLException e) {
-//            throw new DataAccessException("Select nicht erfolgreich", e);
-//        }
-//    }
 }

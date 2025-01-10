@@ -5,22 +5,40 @@ import at.fhtw.mctg.dal.UnitOfWork;
 import at.fhtw.mctg.model.Card;
 import at.fhtw.mctg.model.CardType;
 import at.fhtw.mctg.model.Elements;
-import at.fhtw.mctg.model.User;
 
-import java.lang.annotation.ElementType;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+/**
+ * The CardRepository class provides methods for CRUD operations on Card objects
+ * persisting data in a relational database. It provides functionality to create,
+ * retrieve, and update card data for users and card packages.
+ * <p>
+ * This repository utilizes a UnitOfWork instance to manage database transactions
+ * and prepared statements for secure and efficient database operations.
+ */
 public class CardRepository {
-    private UnitOfWork unitOfWork;
+    private final UnitOfWork unitOfWork;
 
+    /**
+     * Constructs a new CardRepository instance.
+     *
+     * @param unitOfWork the UnitOfWork instance used for managing database transactions
+     */
     public CardRepository(UnitOfWork unitOfWork) {
         this.unitOfWork = unitOfWork;
     }
 
+    /**
+     * Creates a new card entry in the database.
+     *
+     * @param card the card object containing the information to be persisted.
+     *             This includes attributes such as card ID, name, card type,
+     *             damage value, element type, and the associated package ID.
+     */
     public void createCard(Card card) {
         try (PreparedStatement preparedStatement = this.unitOfWork.prepareStatement(
                 """
@@ -41,6 +59,14 @@ public class CardRepository {
         }
     }
 
+    /**
+     * Retrieves a collection of cards from the database that match the specified card ID.
+     *
+     * @param id the unique identifier of the card to be retrieved.
+     * @return a collection of {@code Card} objects that match the provided card ID.
+     * Returns an empty collection if no cards match the specified ID.
+     * @throws DataAccessException if a database access error occurs or the query execution fails.
+     */
     public Collection<Card> getCardById(String id) {
         try (PreparedStatement preparedStatement = this.unitOfWork.prepareStatement(
                 """
@@ -74,6 +100,14 @@ public class CardRepository {
         }
     }
 
+    /**
+     * Updates the ownership of all cards within a specific package,
+     * assigning them to a given user.
+     *
+     * @param packageId the unique identifier for the card package whose cards are to be acquired.
+     * @param userId    the unique identifier of the user to whom the cards will be assigned.
+     * @throws DataAccessException if a database access error occurs during the update operation.
+     */
     public void acquireMultipleCards(int packageId, int userId) {
         try (PreparedStatement preparedStatement = this.unitOfWork.prepareStatement(
                 """
@@ -89,6 +123,14 @@ public class CardRepository {
         }
     }
 
+    /**
+     * Retrieves a collection of cards associated with a specific user ID from the database.
+     *
+     * @param userId the unique identifier of the user whose cards are to be retrieved
+     * @return a collection of {@code Card} objects associated with the specified user ID.
+     * Returns an empty collection if the user has no associated cards.
+     * @throws DataAccessException if a database access error occurs or the query execution fails
+     */
     public Collection<Card> getCardsByUserId(int userId) {
         try (PreparedStatement preparedStatement = this.unitOfWork.prepareStatement(
                 """
@@ -124,6 +166,14 @@ public class CardRepository {
         }
     }
 
+    /**
+     * Retrieves a collection of active cards associated with a specific user ID.
+     *
+     * @param userId the unique identifier of the user whose active cards are to be retrieved
+     * @return a collection of {@code Card} objects that are active and associated with the specified user ID.
+     * Returns an empty collection if the user has no active cards.
+     * @throws DataAccessException if a database access error occurs or the query execution fails
+     */
     public Collection<Card> getActiveCardsByUserId(int userId) {
         try (PreparedStatement preparedStatement = this.unitOfWork.prepareStatement(
                 """
@@ -159,6 +209,12 @@ public class CardRepository {
         }
     }
 
+    /**
+     * Marks a card as active in the database by updating its "is_active" status to TRUE.
+     *
+     * @param cardId the unique identifier of the card to be set as active
+     * @throws DataAccessException if a database access error occurs or the update operation fails
+     */
     public void setCardAsActive(String cardId) {
         try (PreparedStatement preparedStatement = this.unitOfWork.prepareStatement(
                 """
@@ -173,6 +229,13 @@ public class CardRepository {
         }
     }
 
+    /**
+     * Updates the owner of a specific card in the database by changing its associated user ID.
+     *
+     * @param cardId the unique identifier of the card whose ownership is being updated
+     * @param uid    the unique identifier of the new owner of the card
+     * @throws DataAccessException if a database access error occurs or the update operation fails
+     */
     public void updateOwner(String cardId, int uid) {
         try (PreparedStatement preparedStatement = this.unitOfWork.prepareStatement(
                 """

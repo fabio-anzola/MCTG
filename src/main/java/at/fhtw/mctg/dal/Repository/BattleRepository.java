@@ -11,14 +11,38 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 
+/**
+ * Repository for handling `Battle` data operations in the application.
+ * Provides methods to query, create, update, and manage battles and associated data
+ * in the database.
+ */
 public class BattleRepository {
-    private UnitOfWork unitOfWork;
+    private final UnitOfWork unitOfWork;
 
+    /**
+     * Constructs a new instance of the BattleRepository.
+     * This repository is responsible for managing battles and interacting with the database
+     * through the provided UnitOfWork instance.
+     *
+     * @param unitOfWork the UnitOfWork instance used for managing database transactions and operations.
+     */
     public BattleRepository(UnitOfWork unitOfWork) {
         this.unitOfWork = unitOfWork;
     }
 
 
+    /**
+     * Retrieves a collection of pending battles from the database.
+     * Pending battles are those where one user has joined and the status remains unassigned.
+     *
+     * This method queries the database using a SQL statement to select battles with a null status
+     * and exactly one user associated with them. It creates a list of `Battle` objects based on the
+     * query result and returns it.
+     *
+     * @return a collection of `Battle` objects representing pending battles. If no battles are found,
+     * an empty collection is returned.
+     * @throws DataAccessException if a database error occurs during query execution.
+     */
     public Collection<Battle> getPendingBattles() {
         try (PreparedStatement preparedStatement = this.unitOfWork.prepareStatement(
                 """
@@ -52,6 +76,16 @@ public class BattleRepository {
         }
     }
 
+    /**
+     * Creates a new battle in the database for a given user.
+     * This method initializes a battle by adding entries to the battlelog, battle,
+     * and user_battle tables. It also returns a `Battle` object representing the
+     * newly created battle.
+     *
+     * @param username the username of the user who is initiating the battle
+     * @return a `Battle` object containing details of the newly created battle
+     * @throws DataAccessException if an error occurs during database operations
+     */
     public Battle createNewBattle(String username) {
         String init_msg = "Battle Initialized by " + username;
 
@@ -120,6 +154,16 @@ public class BattleRepository {
         }
     }
 
+    /**
+     * Updates the start time of a battle with the specified battle ID in the database.
+     * The method modifies the "time_start" field of the battle entry and retrieves
+     * the updated battle information as a {@code Battle} object.
+     *
+     * @param battleId the unique identifier of the battle to be updated
+     * @param startTime the start time of the battle to be set
+     * @return the updated {@code Battle} object containing the battle's details
+     * @throws DataAccessException if the battle is not found or a database error occurs during the update
+     */
     public Battle setBattleStart(int battleId, Timestamp startTime) {
         try {
             // Update the battle start time
@@ -156,6 +200,17 @@ public class BattleRepository {
         }
     }
 
+    /**
+     * Finalizes an ongoing battle by updating its end time and the number of rounds in the database.
+     * This method modifies the battle entry corresponding to the given battle ID and retrieves
+     * the updated battle information as a {@code Battle} object.
+     *
+     * @param battleId the unique identifier of the battle to be finalized
+     * @param endTime the end time of the battle as a {@code Timestamp}
+     * @param roundsNr the number of rounds played in the battle
+     * @return the updated {@code Battle} object containing the finalized battle's details
+     * @throws DataAccessException if the battle is not found or a database error occurs during the operation
+     */
     public Battle finalizeBattle(int battleId, Timestamp endTime, int roundsNr) {
         try {
             // Update the battle end time and rounds number
@@ -195,6 +250,16 @@ public class BattleRepository {
         }
     }
 
+    /**
+     * Adds a log entry to the battle log associated with a specific battle ID.
+     * This method retrieves the battle log ID for the given battle ID, determines the next row
+     * number in the battle log, and inserts the provided log line into the database.
+     *
+     * @param battleId the unique identifier of the battle for which the log entry is to be added
+     * @param line the log entry text to be added to the battle log
+     * @throws DataAccessException if an error occurs during the database operation,
+     *         such as unable to find the battle log or insert the log entry
+     */
     public void addLogLine(int battleId, String line) {
         try {
             // Step 1: Find the associated battlelog ID
@@ -253,6 +318,14 @@ public class BattleRepository {
         }
     }
 
+    /**
+     * Allows a user to join a battle by inserting their information into the user_battle table.
+     * This method associates the user with the specified battle in the database.
+     *
+     * @param battleId the unique identifier of the battle to join
+     * @param requestingUser the username of the user attempting to join the battle
+     * @throws DataAccessException if a database error occurs during the operation
+     */
     public void joinBattle(int battleId, String requestingUser) {
         try {
             //addLogLine(battleId, requestingUser + " joined the battle");
@@ -274,6 +347,16 @@ public class BattleRepository {
         }
     }
 
+    /**
+     * Finalizes a user's participation in a battle by updating the status in the database.
+     * This method updates the status of an entry in the "user_battle" table corresponding to
+     * a specific battle and user.
+     *
+     * @param battleId the unique identifier of the battle to be finalized for the user
+     * @param userId the unique identifier of the user whose participation is being finalized
+     * @param status the final status of the user in the battle, represented as a {@code BattleStatus} enumeration
+     * @throws DataAccessException if the database operation fails or no entry is found for the given battleId and userId
+     */
     public void finalizeUserBattle(int battleId, int userId, BattleStatus status) {
         try (PreparedStatement preparedStatement = this.unitOfWork.prepareStatement(
                 """
@@ -297,6 +380,15 @@ public class BattleRepository {
         }
     }
 
+    /**
+     * Checks if a battle with the specified battle ID is complete.
+     * A battle is considered complete if there are no users associated with it who have a null status.
+     *
+     * @param battleId the unique identifier of the battle to be checked
+     * @return {@code true} if the battle is complete (no pending users with null status),
+     *         {@code false} otherwise
+     * @throws DataAccessException if a database error occurs during the operation
+     */
     public boolean checkBattleComplete(int battleId) {
         try (PreparedStatement preparedStatement = this.unitOfWork.prepareStatement(
                 """
@@ -331,6 +423,16 @@ public class BattleRepository {
         }
     }
 
+    /**
+     * Retrieves a collection of battle log entries for a specific battle.
+     * This method queries the database to fetch all log entries related to the provided battle ID.
+     * Each log entry is represented as a {@code BattleLog} object and contains information
+     * like the log row number and the log text.
+     *
+     * @param battleId the unique identifier of the battle whose log entries are to be fetched
+     * @return a collection of {@code BattleLog} objects containing the log entries for the battle
+     * @throws DataAccessException if a database error occurs while retrieving the log entries
+     */
     public Collection<BattleLog> getBattleLog(int battleId) {
         try (PreparedStatement preparedStatement = this.unitOfWork.prepareStatement(
                 """
@@ -366,6 +468,16 @@ public class BattleRepository {
         }
     }
 
+    /**
+     * Retrieves a collection of users associated with a specific battle who have a null status.
+     * This method queries the database to fetch entries from the "user_battle" table
+     * where the `fk_pk_battle_id` matches the provided battle ID and the status is null.
+     *
+     * @param battleId the unique identifier of the battle whose users are to be retrieved
+     * @return a collection of {@code UserBattle} objects representing users associated with the battle.
+     *         If no matching users are found, an empty collection is returned.
+     * @throws DataAccessException if a database error occurs during query execution
+     */
     public Collection<UserBattle> getBattleUsers(int battleId) {
         try (PreparedStatement preparedStatement = this.unitOfWork.prepareStatement(
                 """

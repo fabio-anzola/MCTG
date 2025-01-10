@@ -1,27 +1,39 @@
 package at.fhtw.mctg.dal.Repository;
 
-import at.fhtw.httpserver.http.ContentType;
-import at.fhtw.httpserver.http.HttpStatus;
-import at.fhtw.httpserver.server.Response;
 import at.fhtw.mctg.dal.DataAccessException;
 import at.fhtw.mctg.dal.UnitOfWork;
 import at.fhtw.mctg.model.CardPack;
-import at.fhtw.mctg.model.User;
-import org.postgresql.shaded.com.ongres.scram.common.bouncycastle.pbkdf2.Pack;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
 
+/**
+ * The PackageRepository class is responsible for managing database interactions
+ * related to packages in the system. It allows creating new packages and fetching
+ * available free packages.
+ */
 public class PackageRepository {
-    private UnitOfWork unitOfWork;
+    private final UnitOfWork unitOfWork;
 
+    /**
+     * Initializes a new instance of the PackageRepository class with a UnitOfWork instance.
+     * This allows the repository to manage and execute database interactions within a transaction scope.
+     *
+     * @param unitOfWork the UnitOfWork instance that manages the database connection and transaction scope
+     */
     public PackageRepository(UnitOfWork unitOfWork) {
         this.unitOfWork = unitOfWork;
     }
 
+    /**
+     * Creates a new package record in the database and retrieves the generated package ID.
+     * The method executes an SQL insert query using a prepared statement. If the operation
+     * is successful, the newly created package's primary key is returned.
+     *
+     * @return the primary key (ID) of the newly created package
+     * @throws DataAccessException if the SQL execution fails or any database interaction error occurs
+     */
     public int createPackage() {
         try (PreparedStatement preparedStatement = this.unitOfWork.prepareStatement(
                 """
@@ -36,6 +48,14 @@ public class PackageRepository {
         }
     }
 
+    /**
+     * Fetches a free card package from the database. A free package is identified as
+     * one where all its associated cards have not been assigned to any user. The method
+     * executes a SQL query to locate such a package and retrieves its details.
+     *
+     * @return a CardPack object representing the free card package, or null if no such package is available
+     * @throws DataAccessException if a database error occurs during query execution
+     */
     public CardPack getFreePack() {
         try (PreparedStatement preparedStatement = this.unitOfWork.prepareStatement(
                 """

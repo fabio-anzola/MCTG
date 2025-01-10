@@ -12,13 +12,30 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 
+/**
+ * The SessionRepository class provides methods for managing user session tokens
+ * in the database. It allows retrieving tokens associated with a specific username
+ * and creating new tokens for a specified user.
+ */
 public class SessionRepository {
-    private UnitOfWork unitOfWork;
+    private final UnitOfWork unitOfWork;
 
+    /**
+     * Constructs a new SessionRepository instance.
+     *
+     * @param unitOfWork the UnitOfWork instance to manage database operations
+     */
     public SessionRepository(UnitOfWork unitOfWork) {
         this.unitOfWork = unitOfWork;
     }
 
+    /**
+     * Retrieves a collection of tokens associated with the given username.
+     *
+     * @param username the username for which the tokens are to be retrieved
+     * @return a collection of tokens associated with the specified username
+     * @throws DataAccessException if there is an issue accessing the database
+     */
     public Collection<Token> getTokenByUsername(String username) {
         try (PreparedStatement preparedStatement =
                      this.unitOfWork.prepareStatement("""
@@ -49,6 +66,13 @@ public class SessionRepository {
         }
     }
 
+    /**
+     * Creates a new token for the specified user and stores it in the database.
+     *
+     * @param userId the ID of the user for whom the token is being created
+     * @param token  the token value to be saved in the database
+     * @throws DataAccessException if there is an error while interacting with the database
+     */
     public void createToken(int userId, String token) {
         LocalDateTime currentDateTime = LocalDateTime.now();
         try (PreparedStatement preparedStatement = this.unitOfWork.prepareStatement(
