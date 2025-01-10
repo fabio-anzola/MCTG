@@ -8,10 +8,10 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class Response {
-    private int status;
-    private String message;
-    private String contentType;
-    private String content;
+    private final int status;
+    private final String message;
+    private final String contentType;
+    private final String content;
 
     public Response(HttpStatus httpStatus, ContentType contentType, String content) {
         this.status = httpStatus.code;

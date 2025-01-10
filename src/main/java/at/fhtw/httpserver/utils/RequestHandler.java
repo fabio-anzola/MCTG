@@ -12,10 +12,10 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 public class RequestHandler implements Runnable {
-    private Socket clientSocket;
-    private Router router;
-    private PrintWriter printWriter;
-    private BufferedReader bufferedReader;
+    private final Socket clientSocket;
+    private final Router router;
+    private final PrintWriter printWriter;
+    private final BufferedReader bufferedReader;
 
     public RequestHandler(Socket clientSocket, Router router) throws IOException {
         this.clientSocket = clientSocket;
