@@ -63,7 +63,8 @@ public class PackageRepository {
                           FROM "package" p
                           JOIN "card" c ON p.pk_package_id = c.fk_pk_package_id
                           GROUP BY p.pk_package_id
-                          HAVING COUNT(c.pk_card_id) = SUM(CASE WHEN c.fk_pk_user_id IS NULL THEN 1 ELSE 0 END);
+                          HAVING COUNT(c.pk_card_id) = SUM(CASE WHEN c.fk_pk_user_id IS NULL THEN 1 ELSE 0 END)
+                          order by p.pk_package_id;
                         """)) {
 
             ResultSet resultSet = preparedStatement.executeQuery();
