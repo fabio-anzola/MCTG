@@ -51,9 +51,9 @@ public class TradeController extends Controller {
 
             if (trades.isEmpty()) {
                 return new Response(
-                        HttpStatus.NO_CONTENT,
+                        HttpStatus.OK,
                         ContentType.JSON,
-                        "{ \"message\" : \"The request was fine, but there are no trading deals available\" }"
+                        "[]"
                 );
             }
 
