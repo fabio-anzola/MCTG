@@ -1,10 +1,14 @@
 package at.fhtw.httpserver.server;
 
 import at.fhtw.httpserver.http.Method;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
+@Setter
 public class Request {
     private Method method;
     private String urlContent;
