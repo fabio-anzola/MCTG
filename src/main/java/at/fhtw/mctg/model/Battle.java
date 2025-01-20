@@ -20,12 +20,15 @@ public class Battle {
     private int battleId;
 
     @JsonAlias({"TimeStart"})
+    @Getter
     private Timestamp startTime;
 
     @JsonAlias({"TimeEnd"})
+    @Getter
     private Timestamp endTime;
 
     @JsonAlias({"Rounds"})
+    @Getter
     private int rounds;
 
     @JsonAlias({"BattleLogId"})
