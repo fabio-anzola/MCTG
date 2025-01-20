@@ -111,9 +111,9 @@ public class BattleRunner implements Runnable {
         int round = 0;
 
         while (round < MAX_ROUNDS && !this.deckUserA.isEmpty() && !this.deckUserB.isEmpty()) {
-            System.out.println("round = " + round);
-            System.out.println("this.deckUserA.size() = " + this.deckUserA.size());
-            System.out.println("this.deckUserB.size() = " + this.deckUserB.size());
+            // System.out.println("round = " + round);
+            // System.out.println("this.deckUserA.size() = " + this.deckUserA.size());
+            // System.out.prin tln("this.deckUserB.size() = " + this.deckUserB.size());
             round++;
 
             unitOfWork = new UnitOfWork();
@@ -276,7 +276,7 @@ public class BattleRunner implements Runnable {
             // +3 win
             // -5 loss
             new UserRepository(unitOfWorkOverall).updateUserByName(userA.getUsername(), userA);
-            new UserRepository(unitOfWorkOverall).updateUserByName(userA.getUsername(), userB);
+            new UserRepository(unitOfWorkOverall).updateUserByName(userB.getUsername(), userB);
 
             unitOfWorkOverall.commitTransaction();
 
