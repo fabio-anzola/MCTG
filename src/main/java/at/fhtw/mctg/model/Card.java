@@ -11,6 +11,7 @@ import lombok.Setter;
  * user ownership, and associated package details.
  */
 @Getter
+@Setter
 public class Card {
 
     @JsonAlias({"Id"})
