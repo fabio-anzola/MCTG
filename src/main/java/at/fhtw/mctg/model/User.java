@@ -15,6 +15,7 @@ import lombok.ToString;
  */
 @Getter
 @ToString
+@Setter
 public class User {
     @JsonAlias({"userId"})
     private int userId;
