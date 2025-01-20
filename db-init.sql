@@ -45,11 +45,11 @@ CREATE TABLE "user"
     pk_user_id SERIAL,
     username   TEXT    NOT NULL,
     password   TEXT    NOT NULL,
-    name        TEXT,
+    name       TEXT,
     bio        TEXT,
     image      TEXT,
     wallet     INTEGER NOT NULL DEFAULT 20,
-    elo        INTEGER NOT NULL DEFAULT 0,
+    elo        INTEGER NOT NULL DEFAULT 100,
     PRIMARY KEY (pk_user_id),
     UNIQUE (username)
 );
@@ -88,26 +88,24 @@ CREATE TABLE "card"
 CREATE TABLE "battlelog"
 (
     pk_battlelog_id SERIAL,
-    row_nr          BIGINT UNIQUE,
+    row_nr          BIGINT,
     log_text        TEXT NOT NULL,
-    PRIMARY KEY (pk_battlelog_id),
-    UNIQUE (pk_battlelog_id, row_nr)
+    PRIMARY KEY (pk_battlelog_id, row_nr)
 );
 
 CREATE TABLE "battle"
 (
     pk_battle_id       SERIAL,
-    time_start         TIMESTAMPTZ NOT NULL,
-    time_end           TIMESTAMPTZ NOT NULL,
+    time_start         TIMESTAMPTZ,
+    time_end           TIMESTAMPTZ,
     rounds_nr          INTEGER,
-    fk_pk_battlelog_id INTEGER REFERENCES "battlelog" (pk_battlelog_id) ON DELETE CASCADE,
-    log_text           TEXT        NOT NULL,
+    fk_pk_battlelog_id INTEGER,
     PRIMARY KEY (pk_battle_id)
 );
 
 CREATE TABLE "user_battle"
 (
-    status          battleStatus NOT NULL,
+    status          battleStatus,
     fk_pk_user_id   INTEGER REFERENCES "user" (pk_user_id) ON DELETE CASCADE,
     fk_pk_battle_id INTEGER REFERENCES "battle" (pk_battle_id) ON DELETE CASCADE,
     PRIMARY KEY (fk_pk_user_id, fk_pk_battle_id)
@@ -115,13 +113,15 @@ CREATE TABLE "user_battle"
 
 CREATE TABLE "trade"
 (
-    pk_trade_id           SERIAL      NOT NULL,
-    fk_pk_initiator_id    SERIAL REFERENCES "user" (pk_user_id) ON DELETE CASCADE,
-    fk_pk_tradepartner_id SERIAL REFERENCES "user" (pk_user_id) ON DELETE CASCADE,
+    pk_trade_id           TEXT NOT NULL,
+    fk_pk_initiator_id    INTEGER REFERENCES "user" (pk_user_id) ON DELETE CASCADE,
+    fk_pk_tradepartner_id INTEGER REFERENCES "user" (pk_user_id) ON DELETE CASCADE,
     fk_pk_sendercard_id   TEXT REFERENCES "card" (pk_card_id) ON DELETE CASCADE,
     fk_pk_receivercard_id TEXT REFERENCES "card" (pk_card_id) ON DELETE CASCADE,
     status                tradeStatus NOT NULL,
-    time_start            TIMESTAMPTZ NOT NULL,
-    time_completed        TIMESTAMPTZ NOT NULL,
+    time_start            TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    time_completed        TIMESTAMPTZ,
+    requested_type         cardTypes not null,
+    requested_damage       INTEGER not null,
     PRIMARY KEY (pk_trade_id)
 );
