@@ -18,6 +18,7 @@ import at.fhtw.mctg.controller.session.SessionController;
 public class PackService implements Service {
     private final PackController packController;
     private final CardController cardController;
+    private final SessionController sessionController;
 
     /**
      * Constructs a new PackService instance.
@@ -30,6 +31,18 @@ public class PackService implements Service {
     public PackService() {
         this.packController = new PackController();
         this.cardController = new CardController();
+        this.sessionController = new SessionController();
+    }
+
+    /**
+     * Constructor for testing
+     * @param packController
+     * @param cardController
+     */
+    public PackService(PackController packController, CardController cardController, SessionController sessionController) {
+        this.packController = packController;
+        this.cardController = cardController;
+        this.sessionController = sessionController;
     }
 
     /**
@@ -63,7 +76,7 @@ public class PackService implements Service {
                 );
             }
 
-            if (!new SessionController().getUserByToken(request).equals("admin")) {
+            if (!this.sessionController.getUserByToken(request).equals("admin")) {
                 return new Response(
                         HttpStatus.FORBIDDEN,
                         ContentType.JSON,
