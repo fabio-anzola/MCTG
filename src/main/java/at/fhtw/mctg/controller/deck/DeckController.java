@@ -51,9 +51,9 @@ public class DeckController extends Controller {
             // check if there are more that 0 cards
             if (cards.isEmpty()) {
                 return new Response(
-                        HttpStatus.NO_CONTENT,
+                        HttpStatus.OK,
                         ContentType.JSON,
-                        "{ \"message\" : \"The request was fine, but the deck doesn't have any cards\" }"
+                        "[]"
                 );
             }
 
