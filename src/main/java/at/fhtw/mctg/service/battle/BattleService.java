@@ -44,6 +44,15 @@ public class BattleService implements Service {
         this.battleController = new BattleController();
     }
 
+
+    /**
+     * Constructor for testing
+     * @param battleController
+     */
+    public BattleService(BattleController battleController) {
+        this.battleController = battleController;
+    }
+
     /**
      * Handles incoming HTTP requests, specifically focused on processing POST requests
      * for initiating and managing battles. The method validates the request, interacts
