@@ -19,6 +19,10 @@ public class PackController extends Controller {
     public int createPack(Request request) {
         UnitOfWork unitOfWork = new UnitOfWork();
 
+        if (request.getBody() == null) {
+            return -1;
+        }
+
         try (unitOfWork) {
             int id = new PackageRepository(unitOfWork).createPackage();
 
