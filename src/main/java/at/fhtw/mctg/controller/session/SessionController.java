@@ -33,12 +33,23 @@ public class SessionController extends Controller {
      * @return the username
      */
     public String getUserByToken(Request request) {
+        if (request.getHeaderMap().getHeader("Authorization") == null) {
+            return null;
+        }
 
         String token = request.getHeaderMap().getHeader("Authorization").split(" ")[1];
 
         // TODO: change after submission to use jwt token
-        String[] parts = token.split("-");
-        return parts[0];
+        if (1 == 1) {
+            String[] parts = token.split("-");
+            return parts[0];
+        }
+
+        if (JWTGenerator.validateJWT(token)) {
+            System.out.println(JWTGenerator.decodePayload(token).split(":")[1].split(",")[0]);
+            return JWTGenerator.decodePayload(token).split(":")[1].split(",")[0];
+        }
+        return null;
     }
 
     /**
